@@ -3,6 +3,9 @@ package com.filter.textcorrector.spellchecking;
 import com.filter.textcorrector.spellchecking.model.Suggestion;
 import com.filter.textcorrector.spellchecking.util.DamerauLevenshteinDistance;
 import com.filter.textcorrector.spellchecking.util.Soundex;
+import com.filter.textcorrector.text_preproccessing.model.ProccessedText;
+import com.filter.textcorrector.text_preproccessing.util.CleanTextType;
+import com.filter.textcorrector.text_preproccessing.util.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +46,7 @@ public class Spellchecker {
                 .collect(Collectors.toList())*/;
     }
 
+    //TODO: check if word is digit.
     public List<Suggestion> checkCompound(String word) {
         long startTime = System.currentTimeMillis();
 
@@ -117,6 +121,54 @@ public class Spellchecker {
 
         //TODO: think about returning when it didn't find the word.
     }
+
+    //TODO: make first letter always big when checking text.
+   /* public String check(String text){
+
+        String[] clearWords = TextUtils.splitCleanText(correctedText, CleanTextType.SPLIT_CLEARED_WORDS);
+
+        List<String> fixedList = new ArrayList<>();
+
+        for (int i = 0; i < clearWords.length; i++) {
+            String clearWord = clearWords[i];
+
+            if (TextUtils.isWordDigit(TextUtils.cleanText(clearWord, CleanTextType.CLEAR_PUNCTUATION))) {
+                fixedList.add(clearWord);
+                continue;
+            }
+
+            if (spellCheck.contains(clearWord.toLowerCase())
+                    || clearWord.toLowerCase().equals("a")
+                    || clearWord.toLowerCase().equals("i")) {
+                fixedList.add(clearWord);
+                continue;
+            }
+
+            String compound = lookupCompound(clearWord.toLowerCase());
+
+            String fixedWord = "";
+
+            if (compound != null) {
+                if (clearWord.equals(compound)) {
+                    fixedWord = clearWord;
+                } else {
+                    fixedWord = compound;
+                }
+            } else if (keepUnrecognized) {
+                fixedWord = clearWord;
+            }
+
+            fixedList.add(fixedWord);
+
+            correctedText = TextUtils.replaceWord(correctedText, clearWord, fixedWord.toLowerCase());
+        }
+
+        String[] fixedWords = fixedList.toArray(new String[]{});
+
+        return new ProccessedText(originalWords, fixedWords, correctedText);
+
+        return null;
+    }*/
 
     private static final class SuggestionDistanceComparator implements Comparator<Suggestion> {
 

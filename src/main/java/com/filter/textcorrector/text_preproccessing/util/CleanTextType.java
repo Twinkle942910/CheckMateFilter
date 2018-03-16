@@ -1,0 +1,13 @@
+package com.filter.textcorrector.text_preproccessing.util;
+
+public enum CleanTextType {
+    PUNCTUATION_BETWEEN_SINGLE_LETTERS,
+    SPACES_BETWEEN_SINGLE_LETTERS,
+    WHITE_SPACES,
+    SYMBOLS_IN_WORDS,
+    DIGITS_IN_WORDS,
+    SPLIT_WITH_CLEANING,
+    SPLIT_WITHOUT_CLEANING,
+    SPLIT_CLEARED_WORDS,
+    CLEAR_PUNCTUATION
+}
