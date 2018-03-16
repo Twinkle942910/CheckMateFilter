@@ -84,17 +84,20 @@ public class Spellchecker {
 
                 suggestionSplit = new Suggestion(split, Soundex.difference(Soundex.translate(word), Soundex.translate(split)), distance);
 
+                //TODO: don't add repeated suggestions.
                 splitSuggestions.add(suggestionSplit);
             }
         }
 
         Collections.sort(splitSuggestions, suggestionDistanceComparator);
 
+        //TODO: take into account 'keepUnrecognized' tag.
         //TODO: Won't work well, because distance changes if both words are in the dictionary.
         if (!singleWordSuggestions.isEmpty() && !splitSuggestions.isEmpty() && !singleWordSuggestions.get(0).getWord().equals(word)) {
             Suggestion suggestion = splitSuggestions.get(0);
             Suggestion suggestion1 = new Suggestion(suggestion.getWord(), suggestion.getSoundexCodeDistance(), distances.get(suggestion.getWord()));
 
+            //TODO: figure out the problem with 'stayin' and 'staying' words in both lists.
             int best = suggestionDistanceComparator.compare(singleWordSuggestions.get(0), suggestion1);
 
             if (best < 0 || best == 0) {
@@ -137,6 +140,6 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkCompound("lookin"));
+        System.out.println(spellchecker.checkCompound("roughplaces"));
     }
 }

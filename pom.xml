@@ -48,7 +48,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-
+                                        com.filter.textcorrector.spellchecking.Spellchecker
                                     </mainClass>
                                 </manifest>
                             </archive>
