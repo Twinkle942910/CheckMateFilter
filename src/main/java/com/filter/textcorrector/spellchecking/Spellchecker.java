@@ -3,11 +3,15 @@ package com.filter.textcorrector.spellchecking;
 import com.filter.textcorrector.spellchecking.model.Suggestion;
 import com.filter.textcorrector.spellchecking.util.DamerauLevenshteinDistance;
 import com.filter.textcorrector.spellchecking.util.Soundex;
+import com.filter.textcorrector.text_preproccessing.TextPreproccessor;
+import com.filter.textcorrector.text_preproccessing.util.CleanTextType;
+import com.filter.textcorrector.text_preproccessing.util.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,17 +48,14 @@ public class Spellchecker {
     }
 
     public List<Suggestion> checkCompound(String word) {
-        long startTime = System.currentTimeMillis();
+        if (word.equals("") || dictionary.contains(word)) {
+            return Arrays.asList(new Suggestion(word, 0, 0));
+        }
 
         List<Suggestion> splitSuggestions = new ArrayList<>();
 
         //TODO: temp solution, replace later.
         Map<String, Integer> distances = new LinkedHashMap<>();
-
-        if (word.equals("") || dictionary.contains(word)) {
-            return Arrays.asList(new Suggestion(word, 0, 0));
-        }
-
         List<Suggestion> singleWordSuggestions = checkWord(word);
 
         Suggestion firstSingleWord;
@@ -125,9 +126,6 @@ public class Spellchecker {
             if (best < 0 || best == 0) {
                 return singleWordSuggestions;
             }
-
-            long endTime = System.currentTimeMillis();
-            System.out.println("Checking took time: " + (endTime - startTime) + " ms");
         }
 
         return splitSuggestions/*.stream()
@@ -135,61 +133,52 @@ public class Spellchecker {
                 .collect(Collectors.toList())*/;
     }
 
-    //TODO: check if word is digit (inside this method).
-
-    /*String possibleDigit = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
-
-            if(TextUtils.isWordDigit(possibleDigit)){
-        word = possibleDigit;
-    }*/
-
     //TODO: make first letter always big when checking text.
-   /* public String check(String text){
+    public String checkText(String text){
+        long startTime = System.nanoTime();
 
-        String[] clearWords = TextUtils.splitCleanText(correctedText, CleanTextType.SPLIT_CLEARED_WORDS);
-
-        List<String> fixedList = new ArrayList<>();
-
-        for (int i = 0; i < clearWords.length; i++) {
-            String clearWord = clearWords[i];
-
-            if (TextUtils.isWordDigit(TextUtils.cleanText(clearWord, CleanTextType.CLEAR_PUNCTUATION))) {
-                fixedList.add(clearWord);
-                continue;
-            }
-
-            if (spellCheck.contains(clearWord.toLowerCase())
-                    || clearWord.toLowerCase().equals("a")
-                    || clearWord.toLowerCase().equals("i")) {
-                fixedList.add(clearWord);
-                continue;
-            }
-
-            String compound = lookupCompound(clearWord.toLowerCase());
-
-            String fixedWord = "";
-
-            if (compound != null) {
-                if (clearWord.equals(compound)) {
-                    fixedWord = clearWord;
-                } else {
-                    fixedWord = compound;
-                }
-            } else if (keepUnrecognized) {
-                fixedWord = clearWord;
-            }
-
-            fixedList.add(fixedWord);
-
-            correctedText = TextUtils.replaceWord(correctedText, clearWord, fixedWord.toLowerCase());
+        if(text.length() == 0 || text.equals("")){
+            return text;
         }
 
-        String[] fixedWords = fixedList.toArray(new String[]{});
+        Map<String, String> suggestedReplacements = new HashMap<>();
 
-        return new ProccessedText(originalWords, fixedWords, correctedText);
+        String preproccessedText = TextPreproccessor.preproccess(text);
 
-        return null;
-    }*/
+        String[] words = TextUtils.splitCleanText(preproccessedText, CleanTextType.SPLIT_WITHOUT_CLEANING);
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+
+            String cleanWord = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
+
+            if (TextUtils.isWordDigit(cleanWord)) {
+                continue;
+            }
+
+            //TODO: spellcheck and replace only unique words.
+
+            List<Suggestion> wordSuggestions = checkCompound(word);
+
+            String fixedWord = wordSuggestions.get(0).getWord();
+            suggestedReplacements.put(word, fixedWord);
+
+            if (wordSuggestions.isEmpty()){
+                continue;
+            }
+
+            preproccessedText = TextUtils.replaceWord(preproccessedText, word, fixedWord);
+        }
+
+        if(preproccessedText.length() > 0) {
+            preproccessedText = Character.toUpperCase(preproccessedText.charAt(0)) + preproccessedText.substring(1);
+        }
+
+        long endTime = System.nanoTime();
+        System.out.println("Checking took time: " + (endTime - startTime) / (double) 1000000 + " ms");
+
+        return preproccessedText;
+    }
 
     private static final class SuggestionDistanceComparator implements Comparator<Suggestion> {
 
@@ -214,6 +203,6 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkCompound("fucking"));
+        System.out.println(spellchecker.checkText("W@tch you’re w0rds! Sp3ll-check 9'9 may not s3a words that are miss used bec;ase they are spe'lled r1te! W@tch you’re w0rds! Sp3ll-check 9'9 may not s3a words that are miss used bec;ase they are spe'lled r1te!"));
     }
 }

@@ -8783,6 +8783,7 @@ speeches
 speed
 speeds
 spell
+spelled
 spelling
 spencer
 spend
