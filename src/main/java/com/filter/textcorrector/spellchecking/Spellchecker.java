@@ -27,13 +27,13 @@ public class Spellchecker {
 
     public List<Suggestion> checkWord(String word) {
         if (word.equals("") || dictionary.contains(word)) {
-            return new ArrayList<>();
+            return Arrays.asList(new Suggestion(word, 0, 0));
         }
 
         List<Suggestion> suggestedWords = dictionary.search(word, MAX_EDIT_DISTANCE);
 
         if (suggestedWords.isEmpty() && keepUnrecognized) {
-            return Arrays.asList(new Suggestion(word, 0, 0));
+            return Arrays.asList(new Suggestion(word, 100, 100));
         }
 
         Collections.sort(suggestedWords, suggestionDistanceComparator);
@@ -42,14 +42,6 @@ public class Spellchecker {
                 .limit(suggestionLimit)
                 .collect(Collectors.toList())*/;
     }
-
-    //TODO: check if word is digit (inside this method).
-
-    /*String possibleDigit = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
-
-            if(TextUtils.isWordDigit(possibleDigit)){
-        word = possibleDigit;
-    }*/
 
     public List<Suggestion> checkCompound(String word) {
         long startTime = System.currentTimeMillis();
@@ -60,10 +52,22 @@ public class Spellchecker {
         Map<String, Integer> distances = new LinkedHashMap<>();
 
         if (word.equals("") || dictionary.contains(word)) {
-            return splitSuggestions;
+            return Arrays.asList(new Suggestion(word, 0, 0));
         }
 
         List<Suggestion> singleWordSuggestions = checkWord(word);
+
+        Suggestion firstSingleWord;
+
+        if (keepUnrecognized) {
+            firstSingleWord = singleWordSuggestions.get(0);
+        } else {
+            firstSingleWord = new Suggestion(word, 100, 100);
+        }
+
+        if (firstSingleWord.getSoundexCodeDistance() == 0 && firstSingleWord.getEditDistance() == 0) {
+            return singleWordSuggestions;
+        }
 
         if (word.length() > 1) {
             for (int j = 1; j < word.length(); j++) {
@@ -82,31 +86,41 @@ public class Spellchecker {
                 String split = part1Top + " " + part2Top;
 
                 int distance = (int) DamerauLevenshteinDistance.distanceCaseIgnore(word, split);
+                double soundexDistance = Soundex.difference(Soundex.translate(word), Soundex.translate(split));
+
                 distances.put(split, distance);
 
                 if (dictionary.contains(part1Top) && dictionary.contains(part2Top)) {
                     distance -= 1;
+                } else if (dictionary.contains(part1Top) || dictionary.contains(part2Top)) {
+                    soundexDistance += 1;
                 } else {
+                    soundexDistance += 2;
                     distance += 2;
                 }
 
-                suggestionSplit = new Suggestion(split, Soundex.difference(Soundex.translate(word), Soundex.translate(split)), distance);
+                suggestionSplit = new Suggestion(split, soundexDistance, distance);
 
                 //TODO: don't add repeated suggestions.
                 splitSuggestions.add(suggestionSplit);
             }
         }
 
+        if (splitSuggestions.isEmpty() && !singleWordSuggestions.isEmpty()) {
+            return singleWordSuggestions;
+        }
+
         Collections.sort(splitSuggestions, suggestionDistanceComparator);
 
-        //TODO: take into account 'keepUnrecognized' tag.
-        //TODO: Won't work well, because distance changes if both words are in the dictionary.
-        if (!singleWordSuggestions.isEmpty() && !splitSuggestions.isEmpty() && !singleWordSuggestions.get(0).getWord().equals(word)) {
-            Suggestion suggestion = splitSuggestions.get(0);
-            Suggestion suggestion1 = new Suggestion(suggestion.getWord(), suggestion.getSoundexCodeDistance(), distances.get(suggestion.getWord()));
+        Suggestion suggestion = splitSuggestions.get(0);
 
-            //TODO: figure out the problem with 'stayin' and 'staying' words in both lists.
-            int best = suggestionDistanceComparator.compare(singleWordSuggestions.get(0), suggestion1);
+        if (suggestion.getSoundexCodeDistance() >= 1) {
+            if (keepUnrecognized) return singleWordSuggestions;
+            else return new ArrayList<>();
+        } else {
+            Suggestion firstSplitWord = new Suggestion(suggestion.getWord(), suggestion.getSoundexCodeDistance(), distances.get(suggestion.getWord()));
+
+            int best = suggestionDistanceComparator.compare(firstSingleWord, firstSplitWord);
 
             if (best < 0 || best == 0) {
                 return singleWordSuggestions;
@@ -114,17 +128,20 @@ public class Spellchecker {
 
             long endTime = System.currentTimeMillis();
             System.out.println("Checking took time: " + (endTime - startTime) + " ms");
-
-            return splitSuggestions.stream()
-                    .limit(suggestionLimit)
-                    .collect(Collectors.toList());
-        }
-        else {
-            return splitSuggestions;
         }
 
-        //TODO: think about returning when it didn't find the word.
+        return splitSuggestions/*.stream()
+                .limit(suggestionLimit)
+                .collect(Collectors.toList())*/;
     }
+
+    //TODO: check if word is digit (inside this method).
+
+    /*String possibleDigit = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
+
+            if(TextUtils.isWordDigit(possibleDigit)){
+        word = possibleDigit;
+    }*/
 
     //TODO: make first letter always big when checking text.
    /* public String check(String text){
@@ -191,11 +208,12 @@ public class Spellchecker {
                 return 0;
             }
         }
+
     }
 
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkCompound("sucha"));
+        System.out.println(spellchecker.checkCompound("fucking"));
     }
 }
