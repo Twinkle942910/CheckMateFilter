@@ -5,12 +5,14 @@ import com.filter.textcorrector.text_preproccessing.util.TextUtils;
 
 import java.util.regex.Pattern;
 
+//TODO: possibly make it an object to load resources once.
 public class TextPreproccessor {
     private static final SymbolMapper symbolMapper = new SymbolMapper();
 
     public static String preproccess(String text){
         text = symbolMapper.mapNumbers(text);
 
+        //TODO: possibly we don't need this.
         text = TextUtils.cleanText(text, CleanTextType.SPACES_BETWEEN_SINGLE_LETTERS);
         String correctedText = text;
 
@@ -26,10 +28,7 @@ public class TextPreproccessor {
 
             String transliteratedWord = symbolMapper.mapCharacters(word);
 
-            Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
-            boolean hasSpecialChar = p.matcher(originalWords[j]).find();
-
-            if(!hasSpecialChar){
+            if(!hasSpecialChar(originalWords[j])){
                 correctedText = TextUtils.replaceWord(correctedText, originalWords[j], transliteratedWord);
             }
             else {
@@ -42,6 +41,11 @@ public class TextPreproccessor {
         return correctedText;
     }
 
+    private static boolean hasSpecialChar(String originalWord) {
+        Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
+        return p.matcher(originalWord).find();
+    }
+
     private static String cleanText(String text) {
         text = TextUtils.cleanText(text, CleanTextType.PUNCTUATION_BETWEEN_SINGLE_LETTERS);
         text = TextUtils.cleanText(text, CleanTextType.WHITE_SPACES);
@@ -51,6 +55,6 @@ public class TextPreproccessor {
     }
 
     public static void main(String[] args) {
-        System.out.println(TextPreproccessor.preproccess("Watch you’re words! Spell-check may not sea words that are miss used because they are spelled rite!"));
+        System.out.println(TextPreproccessor.preproccess("i'm for the 2;Ӡ"));
     }
 }

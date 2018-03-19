@@ -3,9 +3,6 @@ package com.filter.textcorrector.spellchecking;
 import com.filter.textcorrector.spellchecking.model.Suggestion;
 import com.filter.textcorrector.spellchecking.util.DamerauLevenshteinDistance;
 import com.filter.textcorrector.spellchecking.util.Soundex;
-import com.filter.textcorrector.text_preproccessing.model.ProccessedText;
-import com.filter.textcorrector.text_preproccessing.util.CleanTextType;
-import com.filter.textcorrector.text_preproccessing.util.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +43,14 @@ public class Spellchecker {
                 .collect(Collectors.toList())*/;
     }
 
-    //TODO: check if word is digit.
+    //TODO: check if word is digit (inside this method).
+
+    /*String possibleDigit = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
+
+            if(TextUtils.isWordDigit(possibleDigit)){
+        word = possibleDigit;
+    }*/
+
     public List<Suggestion> checkCompound(String word) {
         long startTime = System.currentTimeMillis();
 
@@ -192,6 +196,6 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkCompound("roughplaces"));
+        System.out.println(spellchecker.checkCompound("sucha"));
     }
 }

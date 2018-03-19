@@ -113,7 +113,7 @@ public class SymbolMapper {
             }
 
             char replacement = codes.get(code) == null ? (char) code : codes.get(code);
-            textArray[position] = Character.toLowerCase(replacement); //TODO: can we cast to lower case without errors?
+            textArray[position] = replacement;
 
             if (startIndex != -1) {
                 move(textArray, startIndex, textArray.length);

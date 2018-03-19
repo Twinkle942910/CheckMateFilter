@@ -79,11 +79,11 @@ public class TextUtils {
                 break;
 
             case PUNCTUATION_BETWEEN_SINGLE_LETTERS:
-                text = text.replaceAll("(?<=\\b\\p{L})\\W+(?=\\p{L}\\b)", "");
+                text = text.replaceAll("(?<=(?<!\\p{L})\\p{L})[^a-zA-Z0-9]+(?=\\p{L}(?!\\p{L}))", "");
                 break;
 
             case SYMBOLS_IN_WORDS:
-                text = text.replaceAll("(?<=\\b)[^a-zA-Z0-9 ]+(?=\\b)", "");
+                text = text.replaceAll("(?<=\\b)[^a-zA-Z0-9 '-]+(?=\\b)", "");
                 break;
 
             case DIGITS_IN_WORDS:
