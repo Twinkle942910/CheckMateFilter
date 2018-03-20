@@ -22,8 +22,8 @@ public class TextPreproccessor {
             String word = originalWords[j];
             String possibleDigit = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
 
-            if(TextUtils.isWordDigit(possibleDigit)){
-                word = possibleDigit;
+            if(TextUtils.isWordDigit(possibleDigit.substring(0, possibleDigit.length() > 0 ? possibleDigit.length() - 1 : 0))){
+                continue;
             }
 
             String transliteratedWord = symbolMapper.mapCharacters(word);
@@ -55,6 +55,6 @@ public class TextPreproccessor {
     }
 
     public static void main(String[] args) {
-        System.out.println(TextPreproccessor.preproccess("i'm for the 2;Ӡ"));
+        System.out.println(TextPreproccessor.preproccess("Evan Lambert 37.9k votes 7.7k voters 465.6k views push-up and 7k 38 items Follow Embed"));
     }
 }

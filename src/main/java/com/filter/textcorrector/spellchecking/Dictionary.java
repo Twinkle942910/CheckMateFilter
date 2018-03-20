@@ -123,7 +123,7 @@ public class Dictionary {
                 try {
 
                     this.add(line);
-                    filter.put(line);
+                    filter.put(line.toLowerCase());
 
                 } catch (Exception e) {
                     e.printStackTrace();

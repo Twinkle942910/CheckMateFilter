@@ -61,7 +61,7 @@ accurately
 accused
 acdbentity
 ace
-acer
+Acer
 achieve
 achieved
 achievement
@@ -1039,7 +1039,7 @@ blonde
 blood
 bloody
 bloom
-bloomberg
+Bloomberg
 blow
 blowing
 blowjob
@@ -2329,10 +2329,10 @@ cum-jockey
 cum-junkie
 cumming
 cums
-cum-shot
 cumshot
-cum-shots
+cum-shot
 cumshots
+cum-shots
 cum-slut
 cum-stain
 cum-swallow
@@ -2942,6 +2942,7 @@ dozen
 dozens
 DP
 DPI
+Dr
 draft
 drag
 dragon
@@ -3340,6 +3341,7 @@ evaluated
 evaluating
 evaluation
 evaluations
+Evan
 evanescence
 Evans
 eve
@@ -3494,6 +3496,7 @@ fabric
 fabrics
 fabulous
 face
+Facebook
 faced
 face-fucker
 faces
@@ -3761,7 +3764,7 @@ flesh-flute
 flex
 flexibility
 flexible
-flickr
+Flickr
 flight
 flights
 flip
@@ -4163,7 +4166,6 @@ gloves
 glow
 glucose
 gm
-gmbh
 gmc
 gmt
 gnome
@@ -4455,8 +4457,8 @@ held
 Helen
 Helena
 helicopter
-he'll
 hell
+he'll
 hello
 helmet
 help
@@ -5067,6 +5069,7 @@ Italy
 item
 items
 its
+it's
 itself
 itunes
 iv
@@ -5568,8 +5571,8 @@ lived
 liver
 liverpool
 lives
-live-sex
 livesex
+live-sex
 livestock
 living
 Liz
@@ -5609,7 +5612,7 @@ logic
 logical
 login
 logistics
-logitech
+Logitech
 logo
 logos
 logs
@@ -5713,6 +5716,7 @@ madness
 Madonna
 Madrid
 mae
+Mafia
 mag
 magazine
 magazines
@@ -5757,6 +5761,7 @@ mali
 mall
 malpractice
 Malta
+mama
 mambo
 mams
 man
@@ -5971,7 +5976,7 @@ metabolism
 metadata
 metal
 metallic
-metallica
+Metallica
 metals
 meter
 meters
@@ -6074,6 +6079,7 @@ mistake
 mistakes
 mistress
 mit
+Mitch
 mitchell
 mitsubishi
 mix
@@ -6198,17 +6204,15 @@ movie
 movies
 moving
 Mozambique
-mozilla
+Mozilla
 MPEG
 mpegs
 mpg
 mph
-mrna
+mRNA
 mrs
 ms
 msg
-msgid
-msgstr
 msie
 msn
 MTV
@@ -6255,7 +6259,7 @@ myers
 myrtle
 myself
 mysimon
-myspace
+Myspace
 mysql
 mysterious
 mystery
@@ -6345,6 +6349,7 @@ Neo
 neon
 neonazi
 nepal
+nerd
 nerve
 nervous
 nest
@@ -6431,6 +6436,7 @@ norm
 normal
 normally
 norman
+Norris
 north
 northeast
 northern
@@ -6541,7 +6547,7 @@ oct
 October
 odd
 odds
-oecd
+OECD
 OEM
 of
 off
@@ -6869,7 +6875,7 @@ payday
 paying
 payment
 payments
-paypal
+Paypal
 payroll
 pays
 PC
@@ -6878,7 +6884,6 @@ PCP
 PCS
 PCT
 PDA
-pdas
 PDF
 PDT
 PE
@@ -6991,7 +6996,8 @@ pharmacology
 pharmacy
 phase
 phases
-phd
+PhD
+PhDs
 phencyclidine
 phenomenon
 phentermine
@@ -7483,6 +7489,7 @@ provinces
 provincial
 provision
 provisions
+provoking
 proxy
 prozac
 prude
@@ -7541,6 +7548,7 @@ pursuit
 push
 pushed
 pushing
+pussies
 pussy
 pussy-fucker
 pussy-licker
@@ -8248,7 +8256,6 @@ saw
 say
 saying
 says
-sbjct
 scale
 scales
 scan
@@ -9465,6 +9472,7 @@ titten
 titties
 titty
 TMP
+to
 tobacco
 tobago
 today
@@ -9704,6 +9712,7 @@ TV
 TVS
 twat
 twats
+tweet
 twelve
 twenty
 twice
@@ -9713,6 +9722,7 @@ twinks
 twins
 twist
 twisted
+twitter
 two
 tyler
 type
@@ -9829,7 +9839,7 @@ user
 username
 users
 uses
-usgs
+USGS
 using
 usps
 usr
@@ -10066,7 +10076,7 @@ wanted
 wanting
 wants
 war
-warcraft
+Warcraft
 ward
 ware
 warehouse
@@ -10150,8 +10160,8 @@ weird
 welcome
 welding
 welfare
-we'll
 well
+we'll
 wellington
 wellness
 wells
@@ -10159,12 +10169,14 @@ welsh
 wendy
 went
 were
+we're
 weren't
 Wesley
 west
 western
 westminster
 wet
+we've
 whale
 what
 whatever
@@ -10270,7 +10282,7 @@ woods
 wool
 worcester
 word
-wordpress
+Wordpress
 words
 work
 worked
@@ -10361,6 +10373,7 @@ yoga
 York
 Yorkshire
 you
+you'll
 young
 younger
 your
@@ -10372,7 +10385,6 @@ yrs
 Yugoslavia
 yukon
 Zambia
-zdnet
 Zealand
 zen
 zero
