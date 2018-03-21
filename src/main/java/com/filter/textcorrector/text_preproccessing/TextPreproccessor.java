@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 //TODO: possibly make it an object to load resources once.
 //TODO: make Singleton.
 public class TextPreproccessor {
+    private static final Pattern NON_ALPHANUMERIC_CHAR = Pattern.compile("[^a-zA-Z0-9_]");
     private static Logger LOGGER = LoggerFactory.getLogger(TextPreproccessor.class);
     private static SymbolMapper symbolMapper;
 
@@ -58,8 +59,7 @@ public class TextPreproccessor {
 
     //TODO: move to TextUtils?
     public static boolean hasSpecialChar(String originalWord) {
-        Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
-        return p.matcher(originalWord).find();
+        return NON_ALPHANUMERIC_CHAR.matcher(originalWord).find();
     }
 
     private static String cleanText(String text) {

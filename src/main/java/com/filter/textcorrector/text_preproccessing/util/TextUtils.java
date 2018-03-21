@@ -4,6 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextUtils {
+    private static final Pattern IS_DIGIT = Pattern.compile("-?\\d+(\\.\\d+)?");
+
     public static String replaceCompound(String text, String compound, String wordReplacement) {
         String compoundRegex = createCompoundRegex(compound);
         return text.replaceAll(compoundRegex, wordReplacement);
@@ -44,7 +46,7 @@ public class TextUtils {
     }
 
     public static boolean isWordDigit(String word) {
-        return word.matches("-?\\d+(\\.\\d+)?");
+        return IS_DIGIT.matcher(word).matches();
     }
 
     public static String[] splitCleanText(String text, CleanTextType cleanTextType) {
@@ -83,7 +85,7 @@ public class TextUtils {
                 break;
 
             case SYMBOLS_IN_WORDS:
-                text = text.replaceAll("(?<=\\b)[^a-zA-Z0-9 (',-.)]+(?=\\b)", "");
+                text = text.replaceAll("(?<=\\b)[^a-zA-Z0-9',-. ]+(?=\\b)", "");
                 break;
 
             case DIGITS_IN_WORDS:
@@ -92,6 +94,10 @@ public class TextUtils {
 
             case CLEAR_PUNCTUATION:
                 text = text.replaceAll("[^a-zA-Z0-9_]", "");
+                break;
+
+            case CLEAR_IRRELEVANT_SYMBOLS:
+                text = text.replaceAll("[^a-zA-Z0-9',-. ]", "");
                 break;
         }
 

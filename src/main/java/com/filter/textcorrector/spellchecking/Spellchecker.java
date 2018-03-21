@@ -28,6 +28,12 @@ public class Spellchecker {
     private int suggestionLimit = 5;
     private TextPreproccessor textPreproccessor;
 
+    //TODO: Instantiate by factory and DI.
+   // public static Spellchecker create(Language language, Suplier<? extends Dictionary> dictionaryFactory);
+
+    //Or don't pass factory, make it inside.
+    //public static Spellchecker create(Language language);
+
     public Spellchecker() {
         dictionary = new Dictionary();
         textPreproccessor = new TextPreproccessor();
@@ -172,7 +178,8 @@ public class Spellchecker {
             String fixedWord;
 
             if(TextPreproccessor.hasSpecialChar(word)){
-                word = cleanWord;
+                word = TextUtils.cleanText(word, CleanTextType.CLEAR_IRRELEVANT_SYMBOLS);
+               // word = cleanWord;
             }
 
             if (!suggestedReplacements.containsKey(word) && !dictionary.contains(word.toLowerCase())) {
@@ -237,7 +244,7 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkText("Consekvensys are motherfuckin strong мotivatoґ"));
+        System.out.println(spellchecker.checkText("Consekvensys are motherfuckin (your'e) leav*ve strong 88 9,9k мotivatoґ"));
         // System.out.println(spellchecker.checkCompound("Stereotypes"));
 
        /* System.out.println(spellchecker.checkOneWord("lambert"));
