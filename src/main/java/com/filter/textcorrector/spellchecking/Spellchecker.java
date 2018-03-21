@@ -235,7 +235,7 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkText("()-"));
+        System.out.println(spellchecker.checkText("jakobs is ma man"));
        // System.out.println(spellchecker.checkCompound("Stereotypes"));
 
        /* System.out.println(spellchecker.checkOneWord("lambert"));

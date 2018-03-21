@@ -9,15 +9,22 @@ import java.util.regex.Pattern;
 public class TextPreproccessor {
     private static final SymbolMapper symbolMapper = new SymbolMapper();
 
+    //TODO: Why does it take so much time?
     public static String preproccess(String text){
+
+        //1ms for 600 words
         text = symbolMapper.mapNumbers(text);
 
+        //8ms for 600 words.
         //TODO: possibly we don't need this.
         text = TextUtils.cleanText(text, CleanTextType.SPACES_BETWEEN_SINGLE_LETTERS);
+
         String correctedText = text;
 
+        //15-16ms for 600 words.
         String[] originalWords = TextUtils.splitCleanText(correctedText, CleanTextType.SPLIT_WITHOUT_CLEANING);
 
+        //110ms for 600 words.
         for (int j = 0; j < originalWords.length; j++) {
             String word = originalWords[j];
             String possibleDigit = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
@@ -36,6 +43,7 @@ public class TextPreproccessor {
             }
         }
 
+        //3ms for 600 words.
         correctedText = cleanText(correctedText);
 
         return correctedText;
