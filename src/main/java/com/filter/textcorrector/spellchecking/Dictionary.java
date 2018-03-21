@@ -6,6 +6,8 @@ import com.filter.textcorrector.spellchecking.util.DamerauLevenshteinDistance;
 import com.filter.textcorrector.spellchecking.util.Soundex;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import java.util.Map;
 import static java.lang.Math.max;
 
 public class Dictionary {
+    private static Logger LOGGER = LoggerFactory.getLogger(Dictionary.class);
     private static final String DICTIONARY_PATH = "/dictionaries/en_most_common_dictionary.txt";
     private BloomFilter<String> filter;
     private int count;
@@ -29,7 +32,7 @@ public class Dictionary {
         loadDictionary();
 
         long endTime = System.currentTimeMillis();
-        System.out.println("Loading took time: " + (endTime - startTime) + " ms");
+        LOGGER.debug("Dictionary loading took time: " + (endTime - startTime) / (double) 1000000 + " ms");
     }
 
     public static class Node {

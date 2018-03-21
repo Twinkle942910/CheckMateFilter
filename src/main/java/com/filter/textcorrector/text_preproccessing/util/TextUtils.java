@@ -83,7 +83,7 @@ public class TextUtils {
                 break;
 
             case SYMBOLS_IN_WORDS:
-                text = text.replaceAll("(?<=\\b)[^a-zA-Z0-9 '-.,]+(?=\\b)", "");
+                text = text.replaceAll("(?<=\\b)[^a-zA-Z0-9 (',-.)]+(?=\\b)", "");
                 break;
 
             case DIGITS_IN_WORDS:

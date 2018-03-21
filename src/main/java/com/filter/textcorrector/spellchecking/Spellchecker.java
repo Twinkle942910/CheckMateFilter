@@ -6,6 +6,8 @@ import com.filter.textcorrector.spellchecking.util.Soundex;
 import com.filter.textcorrector.text_preproccessing.TextPreproccessor;
 import com.filter.textcorrector.text_preproccessing.util.CleanTextType;
 import com.filter.textcorrector.text_preproccessing.util.TextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,15 +19,18 @@ import java.util.List;
 import java.util.Map;
 
 public class Spellchecker {
-
+    private static Logger LOGGER = LoggerFactory.getLogger(Spellchecker.class);
     private static final SuggestionDistanceComparator suggestionDistanceComparator = new SuggestionDistanceComparator();
     private static final int MAX_EDIT_DISTANCE = 2;
+    private static final double MAX_SOUNDEX_DISTANCE = 0.09;
     private Dictionary dictionary;
     private boolean keepUnrecognized = true;
     private int suggestionLimit = 5;
+    private TextPreproccessor textPreproccessor;
 
     public Spellchecker() {
         dictionary = new Dictionary();
+        textPreproccessor = new TextPreproccessor();
     }
 
     public List<Suggestion> checkWord(String word) {
@@ -45,7 +50,7 @@ public class Spellchecker {
 
 
         long endTime = System.nanoTime();
-      // System.out.println("Checking word took time: " + (endTime - startTime) / (double) 1000000 + " ms");
+        // System.out.println("Checking word took time: " + (endTime - startTime) / (double) 1000000 + " ms");
 
         return suggestedWords/*.stream()
                 .limit(suggestionLimit)
@@ -138,20 +143,20 @@ public class Spellchecker {
                 .collect(Collectors.toList())*/;
     }
 
-    //TODO: fix issues with names.
+    //TODO: fix issues with names, plural, corporations.
     public String checkText(String text) {
-        long startTime = System.nanoTime();
+
+        long startProccessingTime = System.nanoTime();
 
         if (text.length() == 0 || text.equals("")) {
             return text;
         }
 
+        boolean firstLetterUpper = Character.isUpperCase(text.charAt(0));
+
         Map<String, String> suggestedReplacements = new HashMap<>();
 
-        long startProccessingTime = System.nanoTime();
-        String preproccessedText = TextPreproccessor.preproccess(text);
-        long endProccessingTime = System.nanoTime();
-        System.out.println("Proccessing took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
+        String preproccessedText = textPreproccessor.preproccess(text);
 
         String[] words = TextUtils.splitCleanText(preproccessedText, CleanTextType.SPLIT_WITHOUT_CLEANING);
 
@@ -166,8 +171,13 @@ public class Spellchecker {
 
             String fixedWord;
 
+            if(TextPreproccessor.hasSpecialChar(word)){
+                word = cleanWord;
+            }
+
             if (!suggestedReplacements.containsKey(word) && !dictionary.contains(word.toLowerCase())) {
-             //   List<Suggestion> wordSuggestions = checkCompound(word);
+                //   List<Suggestion> wordSuggestions = checkCompound(word);
+
                 List<Suggestion> wordSuggestions = checkWord(word);
 
                 if (wordSuggestions.isEmpty()) {
@@ -175,10 +185,9 @@ public class Spellchecker {
                 } else {
                     Suggestion suggestion = wordSuggestions.get(0);
 
-                    if(suggestion.getSoundexCodeDistance() >= 0.09){
+                    if (suggestion.getSoundexCodeDistance() >= MAX_SOUNDEX_DISTANCE) {
                         fixedWord = word;
-                    }
-                    else {
+                    } else {
                         fixedWord = suggestion.getWord();
                     }
                 }
@@ -186,30 +195,23 @@ public class Spellchecker {
                 suggestedReplacements.put(word, fixedWord);
 
                 preproccessedText = TextUtils.replaceWord(preproccessedText, word, fixedWord);
+
             } else {
                 continue;
             }
         }
 
         if (preproccessedText.length() > 0) {
-            preproccessedText = Character.toUpperCase(preproccessedText.charAt(0)) + preproccessedText.substring(1);
+            preproccessedText = firstLetterUpper ?
+                    Character.toUpperCase(preproccessedText.charAt(0)) + preproccessedText.substring(1) :
+                    preproccessedText;
         }
 
-        long endTime = System.nanoTime();
-        System.out.println("Checking took time: " + (endTime - startTime) / (double) 1000000 + " ms");
+        long endProccessingTime = System.nanoTime();
+
+        LOGGER.debug("Checking took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
 
         return preproccessedText;
-    }
-
-    public List<Suggestion> checkOneWord(String word){
-        long startTime = System.nanoTime();
-
-        List<Suggestion> suggestions = checkWord(word);
-
-        long endTime = System.nanoTime();
-        System.out.println("Checking took time: " + (endTime - startTime) / (double) 1000000 + " ms");
-
-        return suggestions;
     }
 
     private static final class SuggestionDistanceComparator implements Comparator<Suggestion> {
@@ -235,8 +237,8 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkText("jakobs is ma man"));
-       // System.out.println(spellchecker.checkCompound("Stereotypes"));
+        System.out.println(spellchecker.checkText("Consekvensys are motherfuckin strong мotivatoґ"));
+        // System.out.println(spellchecker.checkCompound("Stereotypes"));
 
        /* System.out.println(spellchecker.checkOneWord("lambert"));
         System.out.println();

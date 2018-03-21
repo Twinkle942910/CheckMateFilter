@@ -2,29 +2,33 @@ package com.filter.textcorrector.text_preproccessing;
 
 import com.filter.textcorrector.text_preproccessing.util.CleanTextType;
 import com.filter.textcorrector.text_preproccessing.util.TextUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.regex.Pattern;
 
 //TODO: possibly make it an object to load resources once.
+//TODO: make Singleton.
 public class TextPreproccessor {
-    private static final SymbolMapper symbolMapper = new SymbolMapper();
+    private static Logger LOGGER = LoggerFactory.getLogger(TextPreproccessor.class);
+    private static SymbolMapper symbolMapper;
+
+    public TextPreproccessor() {
+        symbolMapper = new SymbolMapper();
+    }
 
     //TODO: Why does it take so much time?
-    public static String preproccess(String text){
+    public String preproccess(String text){
 
-        //1ms for 600 words
+        long startProccessingTime = System.nanoTime();
+
         text = symbolMapper.mapNumbers(text);
-
-        //8ms for 600 words.
-        //TODO: possibly we don't need this.
         text = TextUtils.cleanText(text, CleanTextType.SPACES_BETWEEN_SINGLE_LETTERS);
 
         String correctedText = text;
 
-        //15-16ms for 600 words.
         String[] originalWords = TextUtils.splitCleanText(correctedText, CleanTextType.SPLIT_WITHOUT_CLEANING);
 
-        //110ms for 600 words.
         for (int j = 0; j < originalWords.length; j++) {
             String word = originalWords[j];
             String possibleDigit = TextUtils.cleanText(word, CleanTextType.CLEAR_PUNCTUATION);
@@ -43,13 +47,17 @@ public class TextPreproccessor {
             }
         }
 
-        //3ms for 600 words.
         correctedText = cleanText(correctedText);
+
+        long endProccessingTime = System.nanoTime();
+
+        LOGGER.debug("Preproccessing took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
 
         return correctedText;
     }
 
-    private static boolean hasSpecialChar(String originalWord) {
+    //TODO: move to TextUtils?
+    public static boolean hasSpecialChar(String originalWord) {
         Pattern p = Pattern.compile("[^a-zA-Z0-9_]");
         return p.matcher(originalWord).find();
     }
@@ -63,6 +71,7 @@ public class TextPreproccessor {
     }
 
     public static void main(String[] args) {
-        System.out.println(TextPreproccessor.preproccess("Evan Lambert 37.9k votes 7.7k voters 465.6k views push-up and 7k 38 items Follow Embed"));
+        TextPreproccessor textPreproccessor = new TextPreproccessor();
+        System.out.println(textPreproccessor.preproccess("Evan Lambert 37.9k votes 7.7k voters 465.6k views push-up and 7k 38 items Follow Embed"));
     }
 }

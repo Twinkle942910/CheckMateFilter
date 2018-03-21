@@ -1,5 +1,8 @@
 package com.filter.textcorrector.text_preproccessing;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +10,8 @@ import java.util.Scanner;
 
 public class SymbolMapper {
     private static final String PATH = "/dictionaries/UnicodeToASCIIAppearance.txt";
+
+    private static Logger LOGGER = LoggerFactory.getLogger(SymbolMapper.class);
 
     private Map<Integer, Character> codes;
     private Map<Integer, Character> numberCodes;
@@ -19,6 +24,8 @@ public class SymbolMapper {
 
     private void loadCodes() {
         Scanner scanner = null;
+
+        long startProccessingTime = System.nanoTime();
 
         try {
             scanner = new Scanner(SymbolMapper.class.getResourceAsStream(PATH));
@@ -42,6 +49,11 @@ public class SymbolMapper {
             if (scanner != null) {
                 scanner.close();
             }
+
+            long endProccessingTime = System.nanoTime();
+
+            LOGGER.debug("Symbol mapper loaded. Contains - " + codes.size() + numberCodes.size() + " codes.");
+            LOGGER.debug("Symbol mapper loading took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
         }
     }
 
