@@ -18,6 +18,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static com.filter.textcorrector.spellchecking.Spellchecker.MAX_EDIT_DISTANCE;
+import static com.filter.textcorrector.spellchecking.Spellchecker.MAX_SOUNDEX_DISTANCE;
 import static java.lang.Math.max;
 
 public class Dictionary {
@@ -38,6 +40,7 @@ public class Dictionary {
     public static class Node {
         final String name;
         final Map<Integer, Node> children = new HashMap<>();
+
         public Node(String name) {
             this.name = name;
         }
@@ -52,9 +55,11 @@ public class Dictionary {
 
         public List<Suggestion> search(String node, int maxDistance) {
             int distance = (int) DamerauLevenshteinDistance.distance(this.name.toLowerCase(), node.toLowerCase());
+            double soundexDistance = Soundex.difference(Soundex.translate(this.name), Soundex.translate(node));
+
             List<Suggestion> matches = new LinkedList<>();
-            if (distance <= maxDistance)
-                matches.add(new Suggestion(this.name, Soundex.difference(Soundex.translate(this.name), Soundex.translate(node)), distance));
+            if (distance <= maxDistance && soundexDistance <= MAX_SOUNDEX_DISTANCE * MAX_EDIT_DISTANCE)
+                matches.add(new Suggestion(this.name, soundexDistance, distance));
             if (children.size() == 0)
                 return matches;
             int i = max(1, distance - maxDistance);
@@ -81,7 +86,7 @@ public class Dictionary {
 
 
     public void add(String node) {
-        if(node == null || node.isEmpty()) throw new IllegalArgumentException("word can't be null or empty.");
+        if (node == null || node.isEmpty()) throw new IllegalArgumentException("word can't be null or empty.");
         Node newNode = new Node(node);
         if (root == null) {
             root = newNode;
@@ -89,7 +94,7 @@ public class Dictionary {
         addInternal(root, newNode);
     }
 
-    public boolean contains(String word){
+    public boolean contains(String word) {
         return filter.mightContain(word);
     }
 

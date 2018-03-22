@@ -17,12 +17,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Spellchecker {
     private static Logger LOGGER = LoggerFactory.getLogger(Spellchecker.class);
     private static final SuggestionDistanceComparator suggestionDistanceComparator = new SuggestionDistanceComparator();
-    private static final int MAX_EDIT_DISTANCE = 2;
-    private static final double MAX_SOUNDEX_DISTANCE = 0.045;
+    public static final int MAX_EDIT_DISTANCE = 2;
+    public static final double MAX_SOUNDEX_DISTANCE = 0.045;
     private Dictionary dictionary;
     private boolean keepUnrecognized = true;
     private int suggestionLimit = 5;
@@ -52,11 +53,9 @@ public class Spellchecker {
 
         Collections.sort(suggestedWords, suggestionDistanceComparator);
 
-        //LOGGER.debug("Suggested replacements for '" + word + "' \n" + suggestedWords);
-
-        return suggestedWords/*.stream()
+        return suggestedWords.stream()
                 .limit(suggestionLimit)
-                .collect(Collectors.toList())*/;
+                .collect(Collectors.toList());
     }
 
     public List<Suggestion> checkCompound(String word) {
@@ -185,6 +184,7 @@ public class Spellchecker {
             if (!suggestedReplacements.containsKey(word) && !dictionary.contains(word.toLowerCase())) {
                   //List<Suggestion> wordSuggestions = checkCompound(word);
                 List<Suggestion> wordSuggestions = checkWord(word);
+                //LOGGER.debug("Suggested replacements for '" + word + "' \n" + wordSuggestions);
 
                 if (wordSuggestions.isEmpty()) {
                     fixedWord = "";
@@ -243,7 +243,7 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkText("i wantt hiim soo badd !!"));
+        System.out.println(spellchecker.checkText("i hope everyone is at church so i can just go to my concert in peace on wed.  dont have to worry about rushing back to church to visit"));
        // System.out.println(spellchecker.isValid("stereotipec"));
         // System.out.println(spellchecker.checkCompound("Stereotypes"));
 
