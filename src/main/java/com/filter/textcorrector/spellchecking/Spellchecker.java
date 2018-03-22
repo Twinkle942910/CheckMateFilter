@@ -22,14 +22,14 @@ public class Spellchecker {
     private static Logger LOGGER = LoggerFactory.getLogger(Spellchecker.class);
     private static final SuggestionDistanceComparator suggestionDistanceComparator = new SuggestionDistanceComparator();
     private static final int MAX_EDIT_DISTANCE = 2;
-    private static final double MAX_SOUNDEX_DISTANCE = 0.09;
+    private static final double MAX_SOUNDEX_DISTANCE = 0.045;
     private Dictionary dictionary;
     private boolean keepUnrecognized = true;
     private int suggestionLimit = 5;
     private TextPreproccessor textPreproccessor;
 
     //TODO: Instantiate by factory and DI.
-   // public static Spellchecker create(Language language, Suplier<? extends Dictionary> dictionaryFactory);
+    // public static Spellchecker create(Language language, Suplier<? extends Dictionary> dictionaryFactory);
 
     //Or don't pass factory, make it inside.
     //public static Spellchecker create(Language language);
@@ -43,13 +43,13 @@ public class Spellchecker {
         long startTime = System.nanoTime();
 
         if (word.equals("") || dictionary.contains(word.toLowerCase())) {
-            return Arrays.asList(new Suggestion(word, 0, 0));
+            return Collections.singletonList(new Suggestion(word, 0, 0));
         }
 
         List<Suggestion> suggestedWords = dictionary.search(word, MAX_EDIT_DISTANCE);
 
         if (suggestedWords.isEmpty() && keepUnrecognized) {
-            return Arrays.asList(new Suggestion(word, 100, 100));
+            return Collections.singletonList(new Suggestion(word, 100, 100));
         }
 
         Collections.sort(suggestedWords, suggestionDistanceComparator);
@@ -149,6 +149,10 @@ public class Spellchecker {
                 .collect(Collectors.toList())*/;
     }
 
+    public boolean isValid(String word) {
+        return dictionary.contains(word);
+    }
+
     //TODO: fix issues with names, plural, corporations.
     public String checkText(String text) {
 
@@ -177,9 +181,9 @@ public class Spellchecker {
 
             String fixedWord;
 
-            if(TextPreproccessor.hasSpecialChar(word)){
+            if (TextPreproccessor.hasSpecialChar(word)) {
                 word = TextUtils.cleanText(word, CleanTextType.CLEAR_IRRELEVANT_SYMBOLS);
-               // word = cleanWord;
+                // word = cleanWord;
             }
 
             if (!suggestedReplacements.containsKey(word) && !dictionary.contains(word.toLowerCase())) {
@@ -192,7 +196,7 @@ public class Spellchecker {
                 } else {
                     Suggestion suggestion = wordSuggestions.get(0);
 
-                    if (suggestion.getSoundexCodeDistance() >= MAX_SOUNDEX_DISTANCE) {
+                    if (suggestion.getSoundexCodeDistance() >= MAX_SOUNDEX_DISTANCE * MAX_EDIT_DISTANCE) {
                         fixedWord = word;
                     } else {
                         fixedWord = suggestion.getWord();
@@ -244,7 +248,8 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkText("Consekvensys are motherfuckin (your'e) leav*ve strong 88 9,9k мotivatoґ"));
+        System.out.println(spellchecker.checkText("This is so humiliating in here stereotipec cnut"));
+        System.out.println(spellchecker.isValid("stereotipec"));
         // System.out.println(spellchecker.checkCompound("Stereotypes"));
 
        /* System.out.println(spellchecker.checkOneWord("lambert"));
