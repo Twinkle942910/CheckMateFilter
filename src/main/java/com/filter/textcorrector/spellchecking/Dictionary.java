@@ -22,7 +22,7 @@ import static java.lang.Math.max;
 
 public class Dictionary {
     private static Logger LOGGER = LoggerFactory.getLogger(Dictionary.class);
-    private static final String DICTIONARY_PATH = "/dictionaries/en_most_common_dictionary.txt";
+    private static final String DICTIONARY_PATH = "/dictionaries/en_common_dictionary_80k.txt";
     private BloomFilter<String> filter;
     private int count;
 
@@ -116,7 +116,7 @@ public class Dictionary {
 
             filter = BloomFilter.create(
                     Funnels.stringFunnel(Charset.defaultCharset()),
-                    10500,
+                    81883,
                     0.01);
 
             String line;

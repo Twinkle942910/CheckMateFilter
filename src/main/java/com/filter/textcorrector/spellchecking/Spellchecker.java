@@ -40,8 +40,6 @@ public class Spellchecker {
     }
 
     public List<Suggestion> checkWord(String word) {
-        long startTime = System.nanoTime();
-
         if (word.equals("") || dictionary.contains(word.toLowerCase())) {
             return Collections.singletonList(new Suggestion(word, 0, 0));
         }
@@ -54,9 +52,7 @@ public class Spellchecker {
 
         Collections.sort(suggestedWords, suggestionDistanceComparator);
 
-
-        long endTime = System.nanoTime();
-        // System.out.println("Checking word took time: " + (endTime - startTime) / (double) 1000000 + " ms");
+        //LOGGER.debug("Suggested replacements for '" + word + "' \n" + suggestedWords);
 
         return suggestedWords/*.stream()
                 .limit(suggestionLimit)
@@ -187,8 +183,7 @@ public class Spellchecker {
             }
 
             if (!suggestedReplacements.containsKey(word) && !dictionary.contains(word.toLowerCase())) {
-                //   List<Suggestion> wordSuggestions = checkCompound(word);
-
+                  //List<Suggestion> wordSuggestions = checkCompound(word);
                 List<Suggestion> wordSuggestions = checkWord(word);
 
                 if (wordSuggestions.isEmpty()) {
@@ -248,8 +243,8 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkText("This is so humiliating in here stereotipec cnut"));
-        System.out.println(spellchecker.isValid("stereotipec"));
+        System.out.println(spellchecker.checkText("i wantt hiim soo badd !!"));
+       // System.out.println(spellchecker.isValid("stereotipec"));
         // System.out.println(spellchecker.checkCompound("Stereotypes"));
 
        /* System.out.println(spellchecker.checkOneWord("lambert"));
