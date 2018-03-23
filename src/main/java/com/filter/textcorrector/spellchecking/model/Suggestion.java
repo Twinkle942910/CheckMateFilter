@@ -9,25 +9,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Suggestion implements Comparable<Suggestion> {
     private String word;
-    private double soundexCodeDistance;
+    private float soundexCodeDistance;
     private int editDistance;
+    private float matchPercentage;
 
     @Override
     public String toString() {
-        return "\n Suggestion{" +
+        return "Suggestion{" +
                 "word='" + word + '\'' +
                 ", soundexCodeDistance=" + soundexCodeDistance +
                 ", editDistance=" + editDistance +
-                '}';
+                ", matchPercentage=" + matchPercentage +
+                '}' + '\n';
     }
 
     @Override
     public int compareTo(Suggestion suggestion) {
-        if(this.getEditDistance() < suggestion.getEditDistance())
+        if(this.getMatchPercentage() > suggestion.getMatchPercentage())
         {
             return -1;
         }
-        else if(this.getEditDistance() > suggestion.getEditDistance()){
+        else if(this.getMatchPercentage() < suggestion.getMatchPercentage()){
             return +1;
         }
         return 0;

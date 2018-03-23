@@ -26,7 +26,7 @@ public class DamerauLevenshteinDistance {
      * @return The computed distance.
      * @throws NullPointerException if s1 or s2 is null.
      */
-    public static final double distance(final String s1, final String s2) {
+    public final int distance(final String s1, final String s2) {
 
         if (s1 == null) {
             throw new NullPointerException("s1 must not be null");
@@ -98,20 +98,12 @@ public class DamerauLevenshteinDistance {
         return h[s1.length() + 1][s2.length() + 1];
     }
 
-    //TODO: Not sure if there will not be bugs with this
-    public static final double distanceCaseIgnore(final String s1, final String s2){
-        return distance(s1.toLowerCase(), s2.toLowerCase());
-    }
-
-    private static int min(
-            final int a, final int b, final int c, final int d) {
+    private int min(final int a, final int b, final int c, final int d) {
         return Math.min(a, Math.min(b, Math.min(c, d)));
     }
 
     public static void main(String[] args) {
-        System.out.println(DamerauLevenshteinDistance.distance("shit", "sith"));
+        DamerauLevenshteinDistance damerauLevenshteinDistance = new DamerauLevenshteinDistance();
+        System.out.println(damerauLevenshteinDistance.distance("shit", "sith"));
     }
-
-    /*[ant - 1, can -1, cat - 1, cart - 1, cast - 1, want - 1, can't - 1, cunt - 1, cent - 1]*/
-
 }

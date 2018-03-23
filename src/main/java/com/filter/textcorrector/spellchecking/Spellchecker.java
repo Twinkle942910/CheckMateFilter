@@ -22,33 +22,34 @@ import java.util.stream.Collectors;
 public class Spellchecker {
     private static Logger LOGGER = LoggerFactory.getLogger(Spellchecker.class);
     private static final SuggestionDistanceComparator suggestionDistanceComparator = new SuggestionDistanceComparator();
-    public static final int MAX_EDIT_DISTANCE = 2;
-    public static final double MAX_SOUNDEX_DISTANCE = 0.045;
-    private Dictionary dictionary;
+    private static DamerauLevenshteinDistance damerauLevenshteinDistance = new DamerauLevenshteinDistance();
+    public static final float MAX_EDIT_DISTANCE_PERCENT = 70f;
+    public static final double MAX_SOUNDEX_DISTANCE = 0.09;
+    private EnglishDictionary dictionary;
     private boolean keepUnrecognized = true;
     private int suggestionLimit = 5;
     private TextPreproccessor textPreproccessor;
 
     //TODO: Instantiate by factory and DI.
-    // public static Spellchecker create(Language language, Suplier<? extends Dictionary> dictionaryFactory);
+    // public static Spellchecker create(Language language, Suplier<? extends EnglishDictionary> dictionaryFactory);
 
     //Or don't pass factory, make it inside.
     //public static Spellchecker create(Language language);
 
     public Spellchecker() {
-        dictionary = new Dictionary();
+        dictionary = new EnglishDictionary();
         textPreproccessor = new TextPreproccessor();
     }
 
     public List<Suggestion> checkWord(String word) {
         if (word.equals("") || dictionary.contains(word.toLowerCase())) {
-            return Collections.singletonList(new Suggestion(word, 0, 0));
+            return Collections.singletonList(new Suggestion(word, 0, 0, 0));
         }
 
-        List<Suggestion> suggestedWords = dictionary.search(word, MAX_EDIT_DISTANCE);
+        List<Suggestion> suggestedWords = dictionary.search(word, MAX_EDIT_DISTANCE_PERCENT);
 
         if (suggestedWords.isEmpty() && keepUnrecognized) {
-            return Collections.singletonList(new Suggestion(word, 100, 100));
+            return Collections.singletonList(new Suggestion(word, 100, 100, 100));
         }
 
         Collections.sort(suggestedWords, suggestionDistanceComparator);
@@ -60,7 +61,7 @@ public class Spellchecker {
 
     public List<Suggestion> checkCompound(String word) {
         if (word.equals("") || dictionary.contains(word.toLowerCase())) {
-            return Arrays.asList(new Suggestion(word, 0, 0));
+            return Arrays.asList(new Suggestion(word, 0, 0, 0));
         }
 
         List<Suggestion> splitSuggestions = new ArrayList<>();
@@ -74,7 +75,7 @@ public class Spellchecker {
         if (keepUnrecognized) {
             firstSingleWord = singleWordSuggestions.get(0);
         } else {
-            firstSingleWord = new Suggestion(word, 100, 100);
+            firstSingleWord = new Suggestion(word, 100, 100, 100);
         }
 
         if (firstSingleWord.getSoundexCodeDistance() == 0 && firstSingleWord.getEditDistance() == 0) {
@@ -97,8 +98,8 @@ public class Spellchecker {
                 //select best suggestion for split pair
                 String split = part1Top + " " + part2Top;
 
-                int distance = (int) DamerauLevenshteinDistance.distanceCaseIgnore(word, split);
-                double soundexDistance = Soundex.difference(Soundex.translate(word), Soundex.translate(split));
+                int distance = damerauLevenshteinDistance.distance(word.toLowerCase(), split.toLowerCase());
+                float soundexDistance = Soundex.difference(Soundex.translate(word), Soundex.translate(split));
 
                 distances.put(split, distance);
 
@@ -111,7 +112,7 @@ public class Spellchecker {
                     distance += 2;
                 }
 
-                suggestionSplit = new Suggestion(split, soundexDistance, distance);
+                suggestionSplit = new Suggestion(split, soundexDistance, distance, 100);
 
                 //TODO: don't add repeated suggestions.
                 splitSuggestions.add(suggestionSplit);
@@ -130,7 +131,7 @@ public class Spellchecker {
             if (keepUnrecognized) return singleWordSuggestions;
             else return new ArrayList<>();
         } else {
-            Suggestion firstSplitWord = new Suggestion(suggestion.getWord(), suggestion.getSoundexCodeDistance(), distances.get(suggestion.getWord()));
+            Suggestion firstSplitWord = new Suggestion(suggestion.getWord(), suggestion.getSoundexCodeDistance(), distances.get(suggestion.getWord()), 100);
 
             int best = suggestionDistanceComparator.compare(firstSingleWord, firstSplitWord);
 
@@ -148,12 +149,11 @@ public class Spellchecker {
         return dictionary.contains(word);
     }
 
-    //TODO: fix issues with names, plural, corporations.
     public String checkText(String text) {
 
         long startProccessingTime = System.nanoTime();
 
-        if (text.length() == 0 || text.equals("")) {
+        if (text.length() == 0) {
             return text;
         }
 
@@ -182,16 +182,19 @@ public class Spellchecker {
             }
 
             if (!suggestedReplacements.containsKey(word) && !dictionary.contains(word.toLowerCase())) {
-                  //List<Suggestion> wordSuggestions = checkCompound(word);
+                //List<Suggestion> wordSuggestions = checkCompound(word);
+                long startProccessingTime1 = System.nanoTime();
                 List<Suggestion> wordSuggestions = checkWord(word);
-                //LOGGER.debug("Suggested replacements for '" + word + "' \n" + wordSuggestions);
+                long endProccessingTime1 = System.nanoTime();
+                LOGGER.debug("Word c took time: " + (endProccessingTime1 - startProccessingTime1) / (double) 1000000 + " ms");
+                LOGGER.debug("Suggested replacements for '" + word + "' \n" + wordSuggestions);
 
                 if (wordSuggestions.isEmpty()) {
                     fixedWord = "";
                 } else {
                     Suggestion suggestion = wordSuggestions.get(0);
 
-                    if (suggestion.getSoundexCodeDistance() >= MAX_SOUNDEX_DISTANCE * MAX_EDIT_DISTANCE) {
+                    if (suggestion.getSoundexCodeDistance() >= MAX_SOUNDEX_DISTANCE) {
                         fixedWord = word;
                     } else {
                         fixedWord = suggestion.getWord();
@@ -202,8 +205,6 @@ public class Spellchecker {
 
                 preproccessedText = TextUtils.replaceWord(preproccessedText, word, fixedWord);
 
-            } else {
-                continue;
             }
         }
 
@@ -243,8 +244,8 @@ public class Spellchecker {
     public static void main(String[] args) {
         Spellchecker spellchecker = new Spellchecker();
 
-        System.out.println(spellchecker.checkText("i hope everyone is at church so i can just go to my concert in peace on wed.  dont have to worry about rushing back to church to visit"));
-       // System.out.println(spellchecker.isValid("stereotipec"));
+        System.out.println(spellchecker.checkText("i hope everione is at charch so i can just go cutn stereotipec to my cancert in peace on wed.  dont have to worry about rushing back to church to visit"));
+        // System.out.println(spellchecker.isValid("stereotipec"));
         // System.out.println(spellchecker.checkCompound("Stereotypes"));
 
        /* System.out.println(spellchecker.checkOneWord("lambert"));

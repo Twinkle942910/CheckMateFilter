@@ -25,7 +25,7 @@ public class Soundex {
         return soundexEnglish(word);
     }
 
-    public static double difference(String code1, String code2) {
+    public static float difference(String code1, String code2) {
 
         int lengthDiff = Math.abs(code1.length() - code2.length());
 
@@ -39,14 +39,14 @@ public class Soundex {
             }
         }
 
-        double firstCode1 = Double.parseDouble((int) code1.charAt(0) + code1.substring(1, code1.length()));
-        double firstCode2 = Double.parseDouble((int) code2.charAt(0) + code2.substring(1, code2.length()));
+        float firstCode1 = Float.parseFloat((int) code1.charAt(0) + code1.substring(1, code1.length()));
+        float firstCode2 = Float.parseFloat((int) code2.charAt(0) + code2.substring(1, code2.length()));
 
-        double biggerNew = Math.max(firstCode1, firstCode2);
-        double smallerOriginal = Math.min(firstCode1, firstCode2);
+        float biggerNew = Math.max(firstCode1, firstCode2);
+        float smallerOriginal = Math.min(firstCode1, firstCode2);
 
-        double difference = biggerNew - smallerOriginal;
-        double percentage = ((difference / smallerOriginal) * 100);
+        float difference = biggerNew - smallerOriginal;
+        float percentage = ((difference / smallerOriginal) * 100);
 
         return percentage;
     }
