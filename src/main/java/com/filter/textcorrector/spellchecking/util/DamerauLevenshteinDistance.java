@@ -16,6 +16,10 @@ import java.util.HashMap;
 @Immutable
 public class DamerauLevenshteinDistance {
 
+    private DamerauLevenshteinDistance(){
+        throw new AssertionError("This class is not meant to be instantiated.");
+    }
+
     /**
      * Compute the distance between strings: the minimum number of operations
      * needed to transform one string into the other (insertion, deletion,
@@ -26,7 +30,7 @@ public class DamerauLevenshteinDistance {
      * @return The computed distance.
      * @throws NullPointerException if s1 or s2 is null.
      */
-    public final int distance(final String s1, final String s2) {
+    public static final int distance(final String s1, final String s2) {
 
         if (s1 == null) {
             throw new NullPointerException("s1 must not be null");
@@ -98,12 +102,16 @@ public class DamerauLevenshteinDistance {
         return h[s1.length() + 1][s2.length() + 1];
     }
 
-    private int min(final int a, final int b, final int c, final int d) {
-        return Math.min(a, Math.min(b, Math.min(c, d)));
+    public static float getPercentageDifference(String word, String wordToMatch, int editDistance) {
+        int longestWordLength = Math.max(word.length(), wordToMatch.length());
+        return 100.0f - (((float) editDistance / longestWordLength) * 100.0f);
     }
 
-    public static void main(String[] args) {
-        DamerauLevenshteinDistance damerauLevenshteinDistance = new DamerauLevenshteinDistance();
-        System.out.println(damerauLevenshteinDistance.distance("shit", "sith"));
+    public static int convertPercentageToEditDistance(String keyword, float matchPercentage) {
+        return keyword.length() - (Math.round((keyword.length() * matchPercentage) / 100.0f));
+    }
+
+    private static int min(final int a, final int b, final int c, final int d) {
+        return Math.min(a, Math.min(b, Math.min(c, d)));
     }
 }

@@ -56,7 +56,6 @@ abdicates
 abdicating
 abdication
 abdications
-OMG
 abdomen
 abdomens
 abdominal
@@ -50505,6 +50504,7 @@ omelette
 omelettes
 omen
 omens
+OMG
 omicron
 omicrons
 ominous
