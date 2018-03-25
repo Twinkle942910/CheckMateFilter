@@ -27,6 +27,7 @@ public class Spellchecker {
 
     private boolean keepUnrecognized = true;
     private int suggestionLimit = 5;
+    private boolean checkCompounds = false;
 
     public Spellchecker(Language language) {
         dictionary = DictionaryFactory.create(language);
@@ -119,13 +120,13 @@ public class Spellchecker {
                 //TODO: fix percentage count.
                 if (dictionary.contains(part1Top.toLowerCase()) && dictionary.contains(part2Top.toLowerCase())) {
                     distance -= 1;
-                    splitPercentage = DamerauLevenshteinDistance.getPercentageDifference(word.toLowerCase(), split.toLowerCase(), distance);
+                    splitPercentage += DamerauLevenshteinDistance.getPercentageDifference(word.toLowerCase(), split.toLowerCase(), distance);
                 } else if (dictionary.contains(part1Top.toLowerCase()) || dictionary.contains(part2Top.toLowerCase())) {
                     soundexDistance += 1;
                 } else {
                     soundexDistance += 2;
                     distance += 2;
-                    splitPercentage = DamerauLevenshteinDistance.getPercentageDifference(word.toLowerCase(), split.toLowerCase(), distance);
+                    splitPercentage -= DamerauLevenshteinDistance.getPercentageDifference(word.toLowerCase(), split.toLowerCase(), distance);
                 }
 
                 suggestionSplit = new Suggestion(split, soundexDistance, distance, splitPercentage);
@@ -199,10 +200,17 @@ public class Spellchecker {
             }
 
             if (!suggestedReplacements.containsKey(word) && !dictionary.contains(word.toLowerCase())) {
-                //List<Suggestion> wordSuggestions = getCompoundSuggestions(word);
-                List<Suggestion> wordSuggestions = getWordSuggestions(word);
 
-                if (wordSuggestions.isEmpty()) {
+                List<Suggestion> wordSuggestions;
+
+                if(checkCompounds){
+                    wordSuggestions = getCompoundSuggestions(word);
+                }
+                else {
+                    wordSuggestions = getWordSuggestions(word);
+                }
+
+                if (wordSuggestions == null || wordSuggestions.isEmpty()) {
                     fixedWord = "";
                 } else {
                     Suggestion suggestion = wordSuggestions.get(0);
@@ -259,7 +267,9 @@ public class Spellchecker {
 
        // System.out.println(spellchecker.checkText("sign in sign up ranker home people entertainment sports culture channels videos create a list about us advertise press ranker insights actors celebrity facts historical figures musicians politicians anime gaming movies music tv athletes baseball basketball football soccer food politics & history relationships travel thought provoking weird history graveyard shift total nerd anime underground weird nature weirdly interesting 40 LISTS Jokes, Jokes, JokesGet your laughing lips ready. Chuck Norris Your Mom Yo Mama Knock Knock! Dad Jokes PG Jokes Ancient Comedy Mitch Hedberg Photo: Meetup.com jokes Dirty Adult Jokes That Will Get You a Laugh on Demand Evan Lambert 37.9k votes 7.7k voters 465.6k views 38 items Follow Embed List Rules Vote up the funniest joke! Looking for a quick and dirty joke to get you an easy laugh? Then these funny adult jokes are for you. We've compiled the funniest jokes about sex that you'll ever come across, so that you can go and tell your friends - hopefully without offending them. Vote on your favorite funny adult joke! 1 3,449 VOTES What do a penis and a Rubik's Cube have in common? The more you play with it, the harder it gets. 2,682 767 Agree or disagree? 14 Famous People Who Have PhDs 2 2,233 VOTES How is a push-up bra like a bag of chips? Once you open it, you realize it's half-empty. 1,692 541 Agree or disagree? 3 2,446 VOTES What do boobs and toys have in common? They were both originally made for kids, but daddies end up playing with them. 1,846 600 Agree or disagree? Adult Jokes Hidden In Dr. Seuss Movies That Went Right Over Your Head 4 1,814 VOTES What do the Mafia and pussies have in common? One slip of the tongue, and you're in deep sh*t. 1,384 430 Agree or disagree? LOAD MORE Filed Under: Polls funnyjokesadult jokesHumor love this list? Dirty Adult Jokes That Will Get You a Laugh on Demand share tweet pin email embed rank your version prev list more popular lists next list 47 Adult Jokes in Cartoons You Didn't Get As A Child Female Sports with the Hottest Athletes This Makeup Artist Creates Mesmerizing Lip Art Inspired By Nature The 20 Most Epic Wedding FAILs of All Time Stereotypes That Republicans Are Tired Of Hearing Anime Characters Ranked By How Tragically Their Parents Died The Best Starter Pokemon The Smartest Anime Characters of All Time The 25+ Greatest Anime Characters With Fire Powers Where Were You on September 11th? The Best Generation 1 Pokemon 25 Signs You Just Don't Care About Star Wars Anymore Funny Names to Give a Sugar Glider The Most Overrated Wrestlers of All Time The Best Tasting Whiskey The Most Powerful Anime Characters of All Time The 25+ Best Anime Water Users of All Time . Top 10 Current Queries: biathlon medals song laura bands from colorado versace celebrities chronicles of riddick cast tiger character michael alig sandlot characters famous teenagers teller young mobile site contact us we're hiring embed a list data blog listopedia like us on facebook follow us on pinterest subscribe to our top lists Information and media on this page and throughout Ranker is supplied by Wikipedia, Ranker users, and other sources. Freebase content is freely licensed under the CC-BY license and Wikipedia content is licensed under the GNU Free Documentation license. © Ranker 2018 terms privacy sitemap"));
         //System.out.println(spellchecker.checkCompound("hellowordl"));
-        System.out.println(spellchecker.checkWord("ret@rd"));
+        //System.out.println(spellchecker.checkWord("cutn"));
+
+        System.out.println(spellchecker.checkCompound("hellolwordl"));
 
     }
 }
