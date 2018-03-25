@@ -14,6 +14,7 @@
         <lombok.version>1.16.18</lombok.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <fastutil.version>7.1.0</fastutil.version>
     </properties>
 
     <dependencies>
@@ -38,6 +39,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>${fastutil.version}</version>
+        </dependency>
 
     </dependencies>
 

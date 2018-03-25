@@ -269,7 +269,14 @@ public class Spellchecker {
         //System.out.println(spellchecker.checkCompound("hellowordl"));
         //System.out.println(spellchecker.checkWord("cutn"));
 
-        System.out.println(spellchecker.checkCompound("hellolwordl"));
+        //System.out.println(spellchecker.checkCompound("hellolwordl"));
 
+        System.out.println(spellchecker.checkWord("cutn"));
+
+        long startProccessingTime = System.nanoTime();
+        System.out.println(spellchecker.isValid("cunt"));
+        long endProccessingTime = System.nanoTime();
+
+        LOGGER.debug("isValid() took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
     }
 }
