@@ -7,18 +7,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.regex.Pattern;
 
-//TODO: possibly make it an object to load resources once.
-//TODO: make Singleton.
 public class TextPreproccessor {
-    private static final Pattern NON_ALPHANUMERIC_CHAR = Pattern.compile("[^a-zA-Z0-9_]");
     private static Logger LOGGER = LoggerFactory.getLogger(TextPreproccessor.class);
     private static SymbolMapper symbolMapper;
 
-    public TextPreproccessor() {
-        symbolMapper = new SymbolMapper();
+    private static TextPreproccessor INSTANCE = new TextPreproccessor();
+
+    public static TextPreproccessor getInstance(){
+        return INSTANCE;
     }
 
-    //TODO: Why does it take so much time?
+    private TextPreproccessor() {
+        symbolMapper = new SymbolMapper();
+        //throw new AssertionError("This class is not meant to be instantiated.");
+    }
+
     public String preproccess(String text){
 
         long startProccessingTime = System.nanoTime();
@@ -40,7 +43,7 @@ public class TextPreproccessor {
 
             String transliteratedWord = symbolMapper.mapCharacters(word);
 
-            if(!hasSpecialChar(originalWords[j])){
+            if(!TextUtils.hasSpecialChar(originalWords[j])){
                 correctedText = TextUtils.replaceWord(correctedText, originalWords[j], transliteratedWord);
             }
             else {
@@ -57,21 +60,11 @@ public class TextPreproccessor {
         return correctedText;
     }
 
-    //TODO: move to TextUtils?
-    public static boolean hasSpecialChar(String originalWord) {
-        return NON_ALPHANUMERIC_CHAR.matcher(originalWord).find();
-    }
-
     private static String cleanText(String text) {
         text = TextUtils.cleanText(text, CleanTextType.PUNCTUATION_BETWEEN_SINGLE_LETTERS);
         text = TextUtils.cleanText(text, CleanTextType.WHITE_SPACES);
         text = TextUtils.cleanText(text, CleanTextType.SYMBOLS_IN_WORDS);
         text = TextUtils.cleanText(text, CleanTextType.DIGITS_IN_WORDS);
         return text;
-    }
-
-    public static void main(String[] args) {
-        TextPreproccessor textPreproccessor = new TextPreproccessor();
-        System.out.println(textPreproccessor.preproccess("Evan Lambert 37.9k votes 7.7k voters 465.6k views push-up and 7k 38 items Follow Embed"));
     }
 }

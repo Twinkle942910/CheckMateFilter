@@ -11,7 +11,7 @@ public class TextProccessorTest {
 
     @Before
     public void setUp(){
-        textPreproccessor = new TextPreproccessor();
+        textPreproccessor = TextPreproccessor.getInstance();
     }
 
     @Test

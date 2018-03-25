@@ -5,6 +5,11 @@ import java.util.regex.Pattern;
 
 public class TextUtils {
     private static final Pattern IS_DIGIT = Pattern.compile("-?\\d+(\\.\\d+)?");
+    private static final Pattern NON_ALPHANUMERIC_CHAR = Pattern.compile("[^a-zA-Z0-9_]");
+
+    private TextUtils() {
+        throw new AssertionError("This class is not meant to be instantiated.");
+    }
 
     public static String replaceCompound(String text, String compound, String wordReplacement) {
         String compoundRegex = createCompoundRegex(compound);
@@ -47,6 +52,10 @@ public class TextUtils {
 
     public static boolean isWordDigit(String word) {
         return IS_DIGIT.matcher(word).matches();
+    }
+
+    public static boolean hasSpecialChar(String originalWord) {
+        return NON_ALPHANUMERIC_CHAR.matcher(originalWord).find();
     }
 
     public static String[] splitCleanText(String text, CleanTextType cleanTextType) {

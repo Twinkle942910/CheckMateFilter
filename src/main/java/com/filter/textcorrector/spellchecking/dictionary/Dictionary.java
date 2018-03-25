@@ -1,4 +1,4 @@
-package com.filter.textcorrector.spellchecking;
+package com.filter.textcorrector.spellchecking.dictionary;
 
 import com.filter.textcorrector.spellchecking.model.Suggestion;
 

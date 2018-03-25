@@ -1,14 +1,14 @@
-package com.filter.textcorrector.spellchecking;
+package com.filter.textcorrector.spellchecking.dictionary;
 
+import com.filter.textcorrector.spellchecking.Spellchecker;
+import com.filter.textcorrector.spellchecking.SuggestionSearcher;
 import com.filter.textcorrector.spellchecking.model.Suggestion;
 import com.google.common.hash.BloomFilter;
 import com.google.common.hash.Funnels;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -19,9 +19,9 @@ public class EnglishDictionary implements Dictionary {
     private BloomFilter<String> filter;
 
     public EnglishDictionary() {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         loadDictionary();
-        long endTime = System.currentTimeMillis();
+        long endTime = System.nanoTime();
         LOGGER.debug("Dictionary with size - " + getSize() + " elements loaded in time: " + (endTime - startTime) / (double) 1000000 + " ms");
     }
 
@@ -44,7 +44,8 @@ public class EnglishDictionary implements Dictionary {
         suggestionSearcher = new SuggestionSearcher();
 
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(Spellchecker.class.getResourceAsStream(DICTIONARY_PATH)));
+            InputStream inputStream = new BufferedInputStream(Spellchecker.class.getResourceAsStream(DICTIONARY_PATH));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
             String line;
 
@@ -56,10 +57,16 @@ public class EnglishDictionary implements Dictionary {
                 }
             }
 
+            inputStream.close();
+            reader.close();
+
             filter = BloomFilter.create(
                     Funnels.stringFunnel(Charset.defaultCharset()),
                     getSize(),
                     0.01);
+
+            inputStream = new BufferedInputStream(Spellchecker.class.getResourceAsStream(DICTIONARY_PATH));
+            reader = new BufferedReader(new InputStreamReader(inputStream));
 
             while ((line = reader.readLine()) != null) {
                 try {
@@ -68,6 +75,10 @@ public class EnglishDictionary implements Dictionary {
                     e.printStackTrace();
                 }
             }
+
+            reader.close();
+            inputStream.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

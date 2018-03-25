@@ -1,3 +1,4 @@
+import com.filter.textcorrector.spellchecking.Language;
 import com.filter.textcorrector.spellchecking.Spellchecker;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,7 @@ public class SpellcheckerTest {
 
     @Before
     public void setUp(){
-        spellchecker = new Spellchecker();
+        spellchecker = new Spellchecker(Language.ENGLISH);
     }
 
     @Test

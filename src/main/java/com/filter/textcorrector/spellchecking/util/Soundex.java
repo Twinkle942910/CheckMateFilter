@@ -137,10 +137,6 @@ public class Soundex {
 
     /**
      * Improvement for phonetic code generation, that produces more generic code.
-     *
-     * @param token soundex code.
-     * @param letter
-     * @return improved code.
      */
     private static String convertToScramble(String token, String letter) {
         char[] soundexChars = Arrays.copyOf(token.toCharArray(), token.length());
