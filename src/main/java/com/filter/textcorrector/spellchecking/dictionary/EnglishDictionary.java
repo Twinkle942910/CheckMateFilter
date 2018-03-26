@@ -22,7 +22,8 @@ public class EnglishDictionary implements Dictionary {
     private static Logger LOGGER = LoggerFactory.getLogger(EnglishDictionary.class);
     private static final String DICTIONARY_PATH = "/dictionaries/en_common_dictionary_80k.txt";
     private WordSuggester wordSuggester;
-    private BloomFilter<String> filter;
+   /* private SuggestionSearcher wordSuggester;
+    private BloomFilter<String> filter;*/
 
     public EnglishDictionary() {
         long startTime = System.nanoTime();
@@ -33,7 +34,8 @@ public class EnglishDictionary implements Dictionary {
 
     @Override
     public boolean contains(String word) {
-        return filter.mightContain(word);
+        return wordSuggester.search(word);
+       // return filter.mightContain(word.toLowerCase());
     }
 
     @Override
@@ -57,15 +59,19 @@ public class EnglishDictionary implements Dictionary {
         LOGGER.debug("Getting suggestions in: " + (endTime - startTime) / (double) 1000000 + " ms");
 
         return suggestions;
+
+    // return wordSuggester.search(word, editDistancePercent);
     }
 
     @Override
     public int getSize() {
         return wordSuggester.getNumberOfWords();
+        //return wordSuggester.getSize();
     }
 
     private void loadDictionary() {
-        wordSuggester = new WordSuggester(true, StandardCharsets.UTF_8);
+        wordSuggester = new WordSuggester(false, StandardCharsets.UTF_8);
+        //wordSuggester = new SuggestionSearcher();
 
         try {
             InputStream inputStream = new BufferedInputStream(Spellchecker.class.getResourceAsStream(DICTIONARY_PATH));
@@ -84,7 +90,7 @@ public class EnglishDictionary implements Dictionary {
             inputStream.close();
             reader.close();
 
-            filter = BloomFilter.create(
+           /* filter = BloomFilter.create(
                     Funnels.stringFunnel(Charset.defaultCharset()),
                     getSize(),
                     0.001);
@@ -101,7 +107,7 @@ public class EnglishDictionary implements Dictionary {
             }
 
             reader.close();
-            inputStream.close();
+            inputStream.close();*/
 
         } catch (IOException e) {
             e.printStackTrace();

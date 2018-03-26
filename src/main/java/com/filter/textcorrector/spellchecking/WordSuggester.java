@@ -77,66 +77,6 @@ public class WordSuggester {
     }
 
     /**
-     * Removes a word from the trie.
-     *
-     * @param word
-     * @return
-     */
-    public boolean remove(String word) {
-
-        word = preprocessWord(word);
-
-        int previousWord = 1;
-
-        if (!startsWith(word, false)) {
-            return false;
-        }
-
-        Node currentNode = searchNode(word, false);
-        Node currentParent = currentNode.getParent();
-
-        if (currentParent.isRoot()) {
-            if (currentNode.getCount() > 1) {
-                currentNode.setCount(currentNode.getCount() - 1);
-                if (currentNode.isLeaf()) {
-                    currentNode.setLeaf(false);
-                }
-            } else {
-                this.root.children.remove(currentNode.getC());
-            }
-        }
-
-        while (!currentParent.isRoot()) {
-
-            if (currentParent.getCount() > 1 && previousWord == 1) {
-                if (currentNode.getCount() <= 1) {
-                    currentParent.children.remove(currentNode.getC());
-                } else {
-                    currentNode.setCount(currentNode.getCount() - 1);
-                    if (currentNode.isLeaf()) {
-                        currentNode.setLeaf(false);
-                    }
-                }
-                previousWord = 0;
-            }
-            currentParent.setCount(currentParent.getCount() - 1);
-            if (currentParent.getCount() == 0) {
-                currentParent.children.remove(currentNode.getC());
-            }
-            currentNode = currentParent;
-            currentParent = currentNode.getParent();
-
-            if (currentParent.isRoot() && currentNode.getCount() == 0) {
-                root.children.remove(currentNode.getC());
-            }
-        }
-
-        this.setNumberOfWords(this.getNumberOfWords() - 1);
-
-        return true;
-    }
-
-    /**
      * Search a word in the trie.
      *
      * @param word
@@ -159,36 +99,6 @@ public class WordSuggester {
             }
         }
         return node;
-    }
-
-    /**
-     * Returns if there is any word in the trie that starts with the given
-     * prefix.
-     *
-     * @param prefix
-     * @return true|false
-     */
-    public boolean startsWith(String prefix) {
-
-        return startsWith(prefix, true);
-    }
-
-    /**
-     * Returns if there is any word in the trie that starts with the given
-     * prefix.
-     *
-     * @param prefix
-     * @param doPreprocess
-     * @return true|false
-     */
-    public boolean startsWith(String prefix, boolean doPreprocess) {
-        if (doPreprocess) {
-            prefix = preprocessWord(prefix);
-        }
-        if (searchNode(prefix, false) == null)
-            return false;
-        else
-            return true;
     }
 
     /**
@@ -220,52 +130,6 @@ public class WordSuggester {
     }
 
     /**
-     * Return how many words starting with prefix.
-     *
-     * @param prefix
-     * @return how many words starting with prefix
-     */
-    public int countWordStartsWith(String prefix) {
-
-        prefix = preprocessWord(prefix);
-
-        if (!startsWith(prefix, false)) {
-            return 0;
-        }
-        return (searchNode(prefix, false).getCount());
-    }
-
-    /**
-     * Return words starting with prefix.
-     *
-     * @param prefix
-     * @return a Stream containing words starting with prefix
-     */
-    public Stream<String> getWordStartsWith(String prefix) {
-
-        prefix = preprocessWord(prefix);
-
-        if (!startsWith(prefix, false)) {
-            return Stream.empty();
-        }
-
-        Stream<Node> leafNodes = getLeafNodes(searchNode(prefix, false));
-
-        return leafNodes.map(node -> {
-            Node currentParent = node.getParent();
-            StringBuilder wordBuilder = new StringBuilder();
-            while (currentParent != null) {
-                if (currentParent.getParent() != null) {
-                    wordBuilder.append(currentParent.getC());
-                }
-                currentParent = currentParent.getParent();
-            }
-            return wordBuilder.reverse().append(node.getC()).toString();
-        });
-
-    }
-
-    /**
      * Return a List containing the Leaf Nodes starting from a node using
      * Recursive Depth-first search (DFS).
      *
@@ -283,65 +147,6 @@ public class WordSuggester {
                 return leafNodeStr;
             }
         });
-    }
-
-    /**
-     * Return words starting with prefix
-     *
-     * @param prefix
-     * @return a list containing words starting with prefix
-     */
-
-    public List<String> getWordStartsWithJava7(String prefix) {
-
-        prefix = preprocessWord(prefix);
-
-        List<String> words = new LinkedList<String>();
-
-        if (!startsWith(prefix, false)) {
-            return null;
-        }
-
-        List<Node> leafNodes = getLeafNodesJava7(searchNode(prefix, false));
-
-        for (Node node : leafNodes) {
-            Node currentParent = node.getParent();
-            StringBuilder wordBuilder = new StringBuilder();
-            while (currentParent != null) {
-                if (currentParent.getParent() != null) {
-                    wordBuilder.append(currentParent.getC());
-                }
-                currentParent = currentParent.getParent();
-            }
-            words.add(wordBuilder.reverse().append(node.getC()).toString());
-        }
-
-        return words;
-    }
-
-    /**
-     * Return a List containing the Leaf Nodes starting from a node using
-     * Recursive Depth-first search (DFS)
-     *
-     * @param node
-     * @return List containing the Leaf Nodes
-     */
-    public List<Node> getLeafNodesJava7(Node node) {
-        List<Node> leafNodes = new LinkedList<Node>();
-        // node.setVisited(true);
-        for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
-            // if (entry.getValue().isVisited() == false) {
-            // System.out.print("(" + entry.getValue().getC() + ":" +
-            // entry.getValue().getCount() + ":"
-            // + entry.getValue().getParent().getC() + ")->");
-            if (entry.getValue().isLeaf()) {
-                leafNodes.add(entry.getValue());
-                // System.out.println("*");
-            }
-            leafNodes.addAll(getLeafNodesJava7(entry.getValue()));
-            // }
-        }
-        return leafNodes;
     }
 
     /**
@@ -392,7 +197,7 @@ public class WordSuggester {
 
         // recursively search each branch of the trie
         for (Map.Entry<Character, Node> entry : root.children.entrySet()) {
-            results.putAll(RecursiveLevenshteinDistance(entry.getValue(), '\0', entry.getValue().getC(), word, previousRow, currentRow,
+            results.putAll(RecursiveDamerauLevenshteinDistance(entry.getValue(), '\0', entry.getValue().getC(), word, previousRow, currentRow,
                     results, maxDistance));
         }
 
@@ -400,20 +205,14 @@ public class WordSuggester {
 
     }
 
-    //TODO: replace with damerau l d.
-    public Map<String, Integer> RecursiveLevenshteinDistance(Node node, char prevLetter, char letter, String word,
-                                                             Vector<Integer> previousRow2, Vector<Integer> previousRow, Map<String, Integer> results, int maxDistance) {
-
-        //System.out.println("trie letter "+letter);
-        //System.out.print("previous ");
-        //printVector(previousRow);
+    public Map<String, Integer> RecursiveDamerauLevenshteinDistance(Node node, char prevLetter, char letter, String word,
+                                                                    Vector<Integer> previousRow2, Vector<Integer> previousRow,
+                                                                    Map<String, Integer> results, int maxDistance) {
 
         int columns = previousRow.size();
         Vector<Integer> currentRow = new Vector<Integer>(previousRow.size());
         currentRow.add(0, previousRow.get(0) + 1);
-        // Build one row for the letter, with a column for each letter in the
-        // target word, plus one for the empty string at column 0
-        // Calculate the min cost of insertion, deletion, match or substution
+
         int insertCost, deleteCost, replaceCost;
         for (int i = 1; i < columns; i++) {
             insertCost = currentRow.get(i - 1) + 1;
@@ -434,11 +233,7 @@ public class WordSuggester {
             if ((i > 1) && (prevLetter != '\0') && (word.charAt(i - 1) == prevLetter) && (word.charAt(i - 2) == letter)) {
                 currentRow.set(i, Math.min(currentRow.get(i), previousRow2.get(i - 2) + cost));
             }
-            //printVector(currentRow);
         }
-
-        //System.out.print("currentRow ");
-        //printVector(currentRow);
 
         // If the last entry in the row indicates the optimal cost is less than
         // the maximum distance, and there is a word in this trie node, then add
@@ -461,7 +256,7 @@ public class WordSuggester {
         Integer i = new Integer((int) obj);
         if (i.intValue() <= maxDistance) {
             for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
-                results.putAll(RecursiveLevenshteinDistance(entry.getValue(), letter, entry.getValue().getC(), word, previousRow, currentRow,
+                results.putAll(RecursiveDamerauLevenshteinDistance(entry.getValue(), letter, entry.getValue().getC(), word, previousRow, currentRow,
                         results, maxDistance));
             }
         }
@@ -546,33 +341,6 @@ public class WordSuggester {
         }
     }
 
-    /**
-     * Iterative Depth-first search (DFS) using stack.
-     *
-     * @param node
-     * @return
-     */
-    private void dfsIterative(Node node) {
-
-        Stack<Node> stack = new Stack<Node>();
-        stack.add(node);
-        node.setVisited(true);
-        while (!stack.isEmpty()) {
-            Node element = stack.pop();
-            System.out.print(element.getC() + "\t");
-            if (element.isLeaf()) {
-                System.out.println("*");
-            }
-            for (Map.Entry<Character, Node> entry : element.children.entrySet()) {
-                Node n = entry.getValue();
-                if (n != null && !n.isVisited()) {
-                    stack.add(n);
-                    n.setVisited(true);
-                }
-            }
-        }
-    }
-
     public int getNumberOfWords() {
         return numOfwords;
     }
@@ -597,16 +365,6 @@ public class WordSuggester {
         this.charset = charset;
     }
 
-    public void printVector(Vector<Integer> vec) {
-        StringBuilder sb = new StringBuilder();
-        String separator = "";
-        for (Integer el : vec) {
-            sb.append(separator).append(el.intValue());
-            separator = ",";
-        }
-        System.out.println(sb.toString());
-    }
-
     private static class Node {
 
         private char c;
@@ -617,7 +375,7 @@ public class WordSuggester {
         private boolean isRoot;
         private Node parent;
         //Map<Character, Node> children = new HashMap<Character, Node>();
-        Char2ObjectAVLTreeMap<Node> children = new Char2ObjectAVLTreeMap<Node>();
+        Char2ObjectAVLTreeMap<Node> children = new Char2ObjectAVLTreeMap<>();
 
         public Node() {
             setCount(0);
