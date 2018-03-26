@@ -41,7 +41,10 @@ public class TextPreproccessor {
                 continue;
             }
 
-            String transliteratedWord = symbolMapper.mapCharacters(word);
+            //TODO: check if it works well for all cases.
+            //TODO: Removes double letters where they should be. A bit bad, cause then on dict. lookup will be false.
+            String uniqueWord = TextUtils.removeRepeatedLetters(word); //Consumes aprx. 0.5 ms for word. For large text it's pretty expensive.
+            String transliteratedWord = symbolMapper.mapCharacters(uniqueWord);
 
             if(!TextUtils.hasSpecialChar(originalWords[j])){
                 correctedText = TextUtils.replaceWord(correctedText, originalWords[j], transliteratedWord);

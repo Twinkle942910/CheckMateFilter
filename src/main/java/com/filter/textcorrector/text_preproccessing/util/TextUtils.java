@@ -1,5 +1,7 @@
 package com.filter.textcorrector.text_preproccessing.util;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +60,29 @@ public class TextUtils {
         return NON_ALPHANUMERIC_CHAR.matcher(originalWord).find();
     }
 
+    public static String removeRepeatedLetters(String word) {
+        if (word == null) {
+            throw new IllegalArgumentException("Sorry, can't check null word.");
+        }
+
+        if (word.length() == 1 || word.equals("")) {
+            return word;
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        word = word.toLowerCase();
+
+        for (int i = 0; i < word.length() - 1; i++) {
+            char current = word.charAt(i);
+            if(current != word.charAt(i + 1)){
+                result.append(current);
+            }
+        }
+
+        return result.toString() + word.charAt(word.length() - 1);
+    }
+
     public static String[] splitCleanText(String text, CleanTextType cleanTextType) {
         String[] words = null;
 
@@ -111,6 +136,13 @@ public class TextUtils {
         }
 
         return text;
+    }
+
+    public static void main(String[] args) {
+        long startProccessingTime = System.nanoTime();
+        System.out.println(TextUtils.removeRepeatedLetters("Ssssseeeeettttthhhhhhhh"));
+        long endProccessingTime = System.nanoTime();
+        System.out.println("Checking took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
     }
 
 }
