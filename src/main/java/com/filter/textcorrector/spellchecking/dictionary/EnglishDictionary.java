@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class EnglishDictionary implements Dictionary {
     private static Logger LOGGER = LoggerFactory.getLogger(EnglishDictionary.class);
-    private static final String DICTIONARY_PATH = "/dictionaries/english_words_400k.txt";
+    private static final String DICTIONARY_PATH = "/dictionaries/en_common_dictionary_80k.txt";
     private WordSuggester wordSuggester;
     private BloomFilter<String> filter;
 
@@ -38,10 +38,10 @@ public class EnglishDictionary implements Dictionary {
 
     @Override
     public List<Suggestion> search(String word, float editDistancePercent) {
-        //int distanceThreshold = DamerauLevenshteinDistance.convertPercentageToEditDistance(word, editDistancePercent);
+        int distanceThreshold = DamerauLevenshteinDistance.convertPercentageToEditDistance(word, editDistancePercent);
 
         long startTime = System.nanoTime();
-        Map<String, Integer> suggestionMap = wordSuggester.getSimilarityMap(word, 2);
+        Map<String, Integer> suggestionMap = wordSuggester.getSimilarityMap(word, distanceThreshold);
         long endTime = System.nanoTime();
 
         List<Suggestion> suggestions = new ArrayList<>();
@@ -87,7 +87,7 @@ public class EnglishDictionary implements Dictionary {
             filter = BloomFilter.create(
                     Funnels.stringFunnel(Charset.defaultCharset()),
                     getSize(),
-                    0.01);
+                    0.001);
 
             inputStream = new BufferedInputStream(Spellchecker.class.getResourceAsStream(DICTIONARY_PATH));
             reader = new BufferedReader(new InputStreamReader(inputStream));

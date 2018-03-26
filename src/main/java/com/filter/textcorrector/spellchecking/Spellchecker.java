@@ -65,6 +65,7 @@ public class Spellchecker {
             return Collections.singletonList(new Suggestion(word, 100, 100, 100));
         }
 
+        //TODO: fix soundex distance comparison.
         suggestedWords.sort(suggestionDistanceComparator);
 
         return suggestedWords.stream()
@@ -271,7 +272,7 @@ public class Spellchecker {
 
         //System.out.println(spellchecker.checkCompound("hellolwordl"));
 
-        System.out.println(spellchecker.checkWord("cutn"));
+        System.out.println(spellchecker.checkWord("believin"));
 
         long startProccessingTime = System.nanoTime();
         System.out.println(spellchecker.isValid("cunt"));
