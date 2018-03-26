@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,6 +23,23 @@ public class Suggestion implements Comparable<Suggestion> {
                 ", editDistance=" + editDistance +
                 ", matchPercentage=" + matchPercentage +
                 '}' + '\n';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Suggestion that = (Suggestion) o;
+        return Float.compare(that.soundexCodeDistance, soundexCodeDistance) == 0 &&
+                editDistance == that.editDistance &&
+                Float.compare(that.matchPercentage, matchPercentage) == 0 &&
+                Objects.equals(word, that.word);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), word, soundexCodeDistance, editDistance, matchPercentage);
     }
 
     @Override

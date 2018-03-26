@@ -1,10 +1,18 @@
 package com.filter.textcorrector.spellchecking;
 
+import com.filter.textcorrector.spellchecking.model.Suggestion;
+import com.filter.textcorrector.spellchecking.util.DamerauLevenshteinDistance;
+import com.filter.textcorrector.spellchecking.util.Soundex;
 import it.unimi.dsi.fastutil.chars.Char2ObjectAVLTreeMap;
 
 import java.nio.charset.Charset;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 /**
  * is an efficient information retrieval data structure that we can use to search a word in O(M) time, where
@@ -130,47 +138,6 @@ public class WordSuggester {
     }
 
     /**
-     * Return a List containing the Leaf Nodes starting from a node using
-     * Recursive Depth-first search (DFS).
-     *
-     * @param node
-     * @return a Stream containing the Leaf Nodes
-     */
-    public Stream<Node> getLeafNodes(Node node) {
-        // node.setVisited(true);
-        // .filter(entry -> !entry.getValue().isVisited())
-        return node.children.entrySet().stream().flatMap(entry -> {
-            Stream<Node> leafNodeStr = getLeafNodes(entry.getValue());
-            if (entry.getValue().isLeaf()) {
-                return Stream.concat(Stream.of(entry.getValue()), leafNodeStr);
-            } else {
-                return leafNodeStr;
-            }
-        });
-    }
-
-    /**
-     * Returns the word most similar to the target word.
-     *
-     * @param word
-     * @param maxDistance
-     * @return
-     */
-    public String similarity(String word, int maxDistance) {
-        Map.Entry<String, Integer> min = null;
-
-        Map<String, Integer> results = getSimilarityMap(word, maxDistance);
-
-        for (Map.Entry<String, Integer> el : results.entrySet()) {
-            if (min == null || el.getValue() < min.getValue()) {
-                min = el;
-            }
-
-        }
-        return min.getKey();
-    }
-
-    /**
      * The search function returns a list of all words that are less than the
      * given maximum distance from the target word, using Levenshtein distance
      * References: http://stevehanov.ca/blog/index.php?id=114
@@ -179,9 +146,9 @@ public class WordSuggester {
      * @param word
      * @param maxDistance
      */
-    public Map<String, Integer> getSimilarityMap(String word, int maxDistance) {
+    public List<Suggestion> getSuggestions(String word, int maxDistance) {
 
-        Map<String, Integer> results = new HashMap<>();
+        Set<Suggestion> results = new HashSet<>();
         word = preprocessWord(word);
 
         int size = word.length();
@@ -197,20 +164,19 @@ public class WordSuggester {
 
         // recursively search each branch of the trie
         for (Map.Entry<Character, Node> entry : root.children.entrySet()) {
-            results.putAll(RecursiveDamerauLevenshteinDistance(entry.getValue(), '\0', entry.getValue().getC(), word, previousRow, currentRow,
+            results.addAll(RecursiveDamerauLevenshteinDistance(entry.getValue(), '\0', entry.getValue().getC(), word, previousRow, currentRow,
                     results, maxDistance));
         }
 
-        return results;
-
+        return new ArrayList<>(results);
     }
 
-    public Map<String, Integer> RecursiveDamerauLevenshteinDistance(Node node, char prevLetter, char letter, String word,
-                                                                    Vector<Integer> previousRow2, Vector<Integer> previousRow,
-                                                                    Map<String, Integer> results, int maxDistance) {
+    public Set<Suggestion> RecursiveDamerauLevenshteinDistance(Node node, char prevLetter, char letter, String word,
+                                                               Vector<Integer> previousRow2, Vector<Integer> previousRow,
+                                                               Set<Suggestion> results, int maxDistance) {
 
         int columns = previousRow.size();
-        Vector<Integer> currentRow = new Vector<Integer>(previousRow.size());
+        Vector<Integer> currentRow = new Vector<>(previousRow.size());
         currentRow.add(0, previousRow.get(0) + 1);
 
         int insertCost, deleteCost, replaceCost;
@@ -218,7 +184,7 @@ public class WordSuggester {
             insertCost = currentRow.get(i - 1) + 1;
             deleteCost = previousRow.get(i) + 1;
 
-            int cost = 0;
+            int cost;
 
             if (word.charAt(i - 1) != letter) {
                 replaceCost = previousRow.get(i - 1) + 1;
@@ -247,7 +213,14 @@ public class WordSuggester {
                 }
                 currentParent = currentParent.getParent();
             }
-            results.put(wordBuilder.reverse().append(node.getC()).toString(), currentRow.lastElement());
+
+            String suggestedWord = wordBuilder.reverse().append(node.getC()).toString();
+            int suggestedDistance = currentRow.lastElement();
+
+            float soundexDistance = Soundex.difference(Soundex.translate(suggestedWord), Soundex.translate(word));
+            float percentageDifference = DamerauLevenshteinDistance.getPercentageDifference(suggestedWord, word, suggestedDistance);
+
+            results.add(new Suggestion(suggestedWord, soundexDistance, suggestedDistance, percentageDifference));
         }
 
         // If any entries in the row are less than the maximum distance, then
@@ -256,13 +229,11 @@ public class WordSuggester {
         Integer i = new Integer((int) obj);
         if (i.intValue() <= maxDistance) {
             for (Map.Entry<Character, Node> entry : node.children.entrySet()) {
-                results.putAll(RecursiveDamerauLevenshteinDistance(entry.getValue(), letter, entry.getValue().getC(), word, previousRow, currentRow,
+                results.addAll(RecursiveDamerauLevenshteinDistance(entry.getValue(), letter, entry.getValue().getC(), word, previousRow, currentRow,
                         results, maxDistance));
             }
         }
-
         return results;
-
     }
 
     /**
