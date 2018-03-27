@@ -1,16 +1,13 @@
 package com.filter.textcorrector.profanity_filtering;
 
+import com.filter.textcorrector.profanity_filtering.model.Censored;
 import com.filter.textcorrector.text_preproccessing.util.TextUtils;
 import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -24,16 +21,13 @@ import java.util.stream.Stream;
  */
 //TODO: separate dictionary and functionality (for replacing dict.).
 public class ProfanityFilter {
+    private static Logger LOGGER = LoggerFactory.getLogger(ProfanityFilter.class);
 
-    Logger LOGGER = LoggerFactory.getLogger(ProfanityFilter.class);
-
-    private final String dictionaryPath;
-    private static final ProfanityLengthComparator lengthsComparator = new ProfanityLengthComparator();
-    private int largestWordLength = 0;
     private List<AhoCorasickDoubleArrayTrie<String>.Hit<String>> badWordList;
     private AhoCorasickDoubleArrayTrie<String> dictionary = new AhoCorasickDoubleArrayTrie<>();
-    private String wordReplacement;
     private Map<String, String> badWordsCompounds = new HashMap<>();
+    private final String dictionaryPath;
+    private String wordReplacement;
 
     private ProfanityFilter(final String dictionaryPath, final String wordReplacement) {
         this.dictionaryPath = dictionaryPath;
@@ -59,9 +53,9 @@ public class ProfanityFilter {
             input = clearMultipleProfanity(input.toLowerCase(), badWords);
         }
 
-        LOGGER.debug("Censored text: " + input);
-
         long endProccessingTime = System.nanoTime();
+
+        LOGGER.debug("Censored text: " + input);
         LOGGER.debug("Censoring took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
 
         return input;
@@ -79,9 +73,9 @@ public class ProfanityFilter {
             input = clearMultipleProfanity(input.toLowerCase(), badWords);
         }
 
-        LOGGER.debug("Validated text: " + input);
-
         long endProccessingTime = System.nanoTime();
+
+        LOGGER.debug("Censored text: " + input);
         LOGGER.debug("Censoring took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
 
         return new Censored(input, badWords);
@@ -145,15 +139,9 @@ public class ProfanityFilter {
             lines.forEach(badPhrase -> {
                 badWordsCompounds.put(badPhrase.replaceAll(" ", ""), badPhrase);
                 String word = badPhrase.replaceAll(" ", "").toLowerCase();
-
-                if (word.length() > largestWordLength) {
-                    largestWordLength = word.length();
-                }
-
                 words.put(word, word);
             });
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             LOGGER.debug("Something went wrong with loading a file.");
         }
 
@@ -198,8 +186,7 @@ public class ProfanityFilter {
 
     private List<AhoCorasickDoubleArrayTrie<String>.Hit<String>> getBadWordList(String input) {
         List<AhoCorasickDoubleArrayTrie<String>.Hit<String>> badWords = dictionary.parseText(input);
-        badWords.sort(lengthsComparator);
-
+        badWords.sort((word1, word2) -> Integer.compare(word2.value.length(), word1.value.length()));
         return badWords;
     }
 
@@ -214,27 +201,13 @@ public class ProfanityFilter {
         return input;
     }
 
-    private static class ProfanityLengthComparator implements Comparator<AhoCorasickDoubleArrayTrie<String>.Hit<String>> {
-        @Override
-        public int compare(AhoCorasickDoubleArrayTrie<String>.Hit<String> badWord1, AhoCorasickDoubleArrayTrie<String>.Hit<String> badWord2) {
-            return Integer.compare(badWord2.value.length(), badWord1.value.length());
-        }
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class Censored {
-        private String censoredText;
-        private Set<String> badWordList;
-    }
-
     public static void main(String[] args) {
         ProfanityFilter profanityFilter = new ProfanityFilter.Builder()
                 .withWordReplacement("[censored]")
                 .build();
 
-        //System.out.println(profanityFilter.censor("Little piece of shit"));
-        System.out.println(profanityFilter.searchForProfanity("Little piece of shit and silly cunt"));
+        System.out.println(profanityFilter.censor("Hello fucking world holy cow"));
+        System.out.println(profanityFilter.searchForProfanity("stupid motherfucker"));
+        System.out.println(profanityFilter.censor("Little piece of shit and silly cunt"));
     }
 }
