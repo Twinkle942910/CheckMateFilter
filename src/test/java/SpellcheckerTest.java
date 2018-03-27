@@ -12,7 +12,7 @@ public class SpellcheckerTest {
 
     @Before
     public void setUp(){
-        spellchecker = new Spellchecker(Language.ENGLISH);
+       // spellchecker = new Spellchecker(Language.ENGLISH);
     }
 
     @Test

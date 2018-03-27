@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public class TextPreproccessor {
     private static Logger LOGGER = LoggerFactory.getLogger(TextPreproccessor.class);
     private static SymbolMapper symbolMapper;
+    private boolean removeRepeatedLetters = false;
 
     private static TextPreproccessor INSTANCE = new TextPreproccessor();
 
@@ -20,6 +21,11 @@ public class TextPreproccessor {
     private TextPreproccessor() {
         symbolMapper = new SymbolMapper();
         //throw new AssertionError("This class is not meant to be instantiated.");
+    }
+
+    public String preproccess(String text, boolean removeRepeatedLetters){
+        this.removeRepeatedLetters = removeRepeatedLetters;
+        return preproccess(text);
     }
 
     public String preproccess(String text){
@@ -43,7 +49,11 @@ public class TextPreproccessor {
 
             //TODO: check if it works well for all cases.
             //TODO: Removes double letters where they should be. A bit bad, cause then on dict. lookup will be false.
-            String uniqueWord = TextUtils.removeRepeatedLetters(word); //Consumes aprx. 0.5 ms for word. For large text it's pretty expensive.
+           String uniqueWord = word;
+
+            if(removeRepeatedLetters){
+                uniqueWord = TextUtils.removeRepeatedLetters(word); //Consumes aprx. 0.5 ms for word. For large text it's pretty expensive.
+            }
             String transliteratedWord = symbolMapper.mapCharacters(uniqueWord);
 
             if(!TextUtils.hasSpecialChar(originalWords[j])){

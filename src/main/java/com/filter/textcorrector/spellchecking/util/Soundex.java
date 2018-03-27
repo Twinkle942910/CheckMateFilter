@@ -7,6 +7,8 @@ import java.util.Map;
 /**
  * Improved SoundEx algorithm implementation for comparing words phonetics.
  */
+
+//TODO: load resources once on initialization.
 public class Soundex {
 
     /**
