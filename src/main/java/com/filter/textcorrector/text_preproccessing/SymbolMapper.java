@@ -125,7 +125,7 @@ public class SymbolMapper {
             }
 
             char replacement = codes.get(code) == null ? (char) code : codes.get(code);
-            textArray[position] = replacement;
+            textArray[position] = Character.toLowerCase(replacement);
 
             if (startIndex != -1) {
                 move(textArray, startIndex, textArray.length);
