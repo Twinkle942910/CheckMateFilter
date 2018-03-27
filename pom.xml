@@ -15,6 +15,7 @@
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.25</slf4j.version>
         <fastutil.version>7.1.0</fastutil.version>
+        <aho.corasick.version>1.1.0</aho.corasick.version>
     </properties>
 
     <dependencies>
@@ -43,6 +44,12 @@
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
             <version>${fastutil.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hankcs</groupId>
+            <artifactId>aho-corasick-double-array-trie</artifactId>
+            <version>${aho.corasick.version}</version>
         </dependency>
 
     </dependencies>
