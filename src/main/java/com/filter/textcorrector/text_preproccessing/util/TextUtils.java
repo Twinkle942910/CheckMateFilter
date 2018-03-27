@@ -1,12 +1,11 @@
 package com.filter.textcorrector.text_preproccessing.util;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextUtils {
     private static final Pattern IS_DIGIT = Pattern.compile("-?\\d+(\\.\\d+)?");
+    private static final Pattern CONTAINS_DIGIT = Pattern.compile("\\d+");
     private static final Pattern NON_ALPHANUMERIC_CHAR = Pattern.compile("[^a-zA-Z0-9_]");
 
     private TextUtils() {
@@ -56,6 +55,10 @@ public class TextUtils {
         return IS_DIGIT.matcher(word).matches();
     }
 
+    public static boolean containsDigit(String word) {
+        return CONTAINS_DIGIT.matcher(word).find();
+    }
+
     public static boolean hasSpecialChar(String originalWord) {
         return NON_ALPHANUMERIC_CHAR.matcher(originalWord).find();
     }
@@ -75,7 +78,7 @@ public class TextUtils {
 
         for (int i = 0; i < word.length() - 1; i++) {
             char current = word.charAt(i);
-            if(current != word.charAt(i + 1)){
+            if (current != word.charAt(i + 1)) {
                 result.append(current);
             }
         }
@@ -140,7 +143,8 @@ public class TextUtils {
 
     public static void main(String[] args) {
         long startProccessingTime = System.nanoTime();
-        System.out.println(TextUtils.removeRepeatedLetters("Ssssseeeeettttthhhhhhhh"));
+        // System.out.println(TextUtils.removeRepeatedLetters("Ssssseeeeettttthhhhhhhh"));
+        System.out.println(TextUtils.containsDigit("39.7k"));
         long endProccessingTime = System.nanoTime();
         System.out.println("Checking took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
     }
