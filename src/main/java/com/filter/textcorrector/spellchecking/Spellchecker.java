@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Spellchecker {
+    //TODO: maybe increase this factor (try word 'hrlo').
     private static final float MAX_SOUNDEX_DISTANCE = 0.09f;
 
     private static Logger LOGGER = LoggerFactory.getLogger(Spellchecker.class);
@@ -166,6 +167,10 @@ public class Spellchecker {
 
     public void doPreproccessing(boolean doPreproccessing) {
         this.doPreproccessing = doPreproccessing;
+    }
+
+    public void setMaxMatchPercentage(float maxEditDistancePercent){
+        this.maxEditDistancePercent = maxEditDistancePercent;
     }
 
     private <F, T> List<T> convertList(List<F> from, Function<F, T> by) {
@@ -377,6 +382,6 @@ public class Spellchecker {
         //System.out.println(spellchecker.isValid("cunt"));
 
        // System.out.println(spellchecker.checkText("You#are d0uch3 and that is $o sad."));
-        System.out.println(spellchecker.checkText("hello_city@gmail.com"));
+        System.out.println(spellchecker.checkText("hrlo"));
     }
 }

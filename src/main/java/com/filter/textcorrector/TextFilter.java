@@ -25,6 +25,19 @@ public class TextFilter implements Filter {
         textPreproccessor = TextPreproccessor.getInstance();
     }
 
+    public TextFilter(Language language, String dictionaryPath){
+        spellchecker = new Spellchecker.Builder(language)
+                .withSuggestionLimit(7)
+                .build();
+
+        profanityFilter = new ProfanityFilter.Builder()
+                .withWordReplacement("[profanity]")
+                .withDictionary(dictionaryPath)
+                .build();
+
+        textPreproccessor = TextPreproccessor.getInstance();
+    }
+
     @Override
     public List<String> checkWord(String word) {
         return spellchecker.checkWord(word);
@@ -60,6 +73,11 @@ public class TextFilter implements Filter {
         return spellchecker.isValid(word);
     }
 
+    @Override
+    public boolean isProfane(String word){
+        return profanityFilter.isProfane(word);
+    }
+
     public void doPreproccessing(boolean doPreproccessing){
         spellchecker.doPreproccessing(doPreproccessing);
     }
@@ -81,8 +99,20 @@ public class TextFilter implements Filter {
     }
 
     public void changeLanguage(Language language){
-        profanityFilter.chaneLanguage(language);
+        profanityFilter.changeLanguage(language);
         spellchecker.changeLanguage(language);
+    }
+
+    public void setProfanityReplacement(String replacement){
+        profanityFilter.setProfanityReplacement(replacement);
+    }
+
+    public void doRemoveProfaneWord(boolean removeProfaneWord){
+        profanityFilter.removeProfaneWord(removeProfaneWord);
+    }
+
+    public void setMaxMatchPercentage(float maxMatchPercentage){
+        spellchecker.setMaxMatchPercentage(maxMatchPercentage);
     }
 
     public static void main(String[] args) {

@@ -18,9 +18,11 @@ public class ProfanityFilter {
     private static Logger LOGGER = LoggerFactory.getLogger(ProfanityFilter.class);
     private Dictionary dictionary;
     private String wordReplacement;
+    private boolean wordRemoval;
 
     private ProfanityFilter(Builder builder) {
         this.wordReplacement = builder.wordReplacement;
+        this.wordRemoval = builder.wordRemoval;
         dictionary = DictionaryFactory.create(builder.language, builder.dictionaryPath);
     }
 
@@ -66,8 +68,28 @@ public class ProfanityFilter {
         return new Censored(input, badWords);
     }
 
-    public void chaneLanguage(Language language){
+    public void changeLanguage(Language language){
         dictionary = DictionaryFactory.create(language, "");
+    }
+
+    public boolean isProfane(String word){
+        return dictionary.isProfane(word);
+    }
+
+    public void setProfanityReplacement(String wordReplacement){
+        if (wordRemoval) {
+            this.wordReplacement = "";
+        } else {
+            this.wordReplacement = wordReplacement;
+        }
+    }
+
+    public void removeProfaneWord(boolean removeProfaneWord){
+        this.wordRemoval = removeProfaneWord;
+
+        if (wordRemoval) {
+            this.wordReplacement = "";
+        }
     }
 
     private String clearMultipleProfanity(String input, Set<String> badWords) {
