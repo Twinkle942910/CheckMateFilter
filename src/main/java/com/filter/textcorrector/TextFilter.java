@@ -13,21 +13,9 @@ public class TextFilter implements Filter {
     private ProfanityFilter profanityFilter;
     private TextPreproccessor textPreproccessor;
 
-    public TextFilter(Language language) {
+    public TextFilter(Language language, String dictionaryPath) {
         spellchecker = new Spellchecker.Builder(language)
-                .withSuggestionLimit(7)
-                .build();
-
-        profanityFilter = new ProfanityFilter.Builder()
-                .withWordReplacement("[profanity]")
-                .build();
-
-        textPreproccessor = TextPreproccessor.getInstance();
-    }
-
-    public TextFilter(Language language, String dictionaryPath){
-        spellchecker = new Spellchecker.Builder(language)
-                .withSuggestionLimit(7)
+                .withSuggestionLimit(3)
                 .build();
 
         profanityFilter = new ProfanityFilter.Builder()
@@ -36,6 +24,10 @@ public class TextFilter implements Filter {
                 .build();
 
         textPreproccessor = TextPreproccessor.getInstance();
+    }
+
+    public TextFilter(Language language) {
+        this(language, "");
     }
 
     @Override
@@ -74,50 +66,44 @@ public class TextFilter implements Filter {
     }
 
     @Override
-    public boolean isProfane(String word){
+    public boolean isProfane(String word) {
         return profanityFilter.isProfane(word);
     }
 
-    public void doPreproccessing(boolean doPreproccessing){
+    public void doPreproccessing(boolean doPreproccessing) {
         spellchecker.doPreproccessing(doPreproccessing);
     }
 
-    public void doRemoveRepeatedLetters(boolean doRemoveRepeatedLetters){
+    public void doRemoveRepeatedLetters(boolean doRemoveRepeatedLetters) {
         spellchecker.doRemoveRepeatedLetters(doRemoveRepeatedLetters);
     }
 
-    public void doCheckCompounds(boolean doCheckCompounds){
+    public void doCheckCompounds(boolean doCheckCompounds) {
         spellchecker.doCheckCompounds(doCheckCompounds);
     }
 
-    public void setSuggestionLimit(int suggestionLimit){
+    public void setSuggestionLimit(int suggestionLimit) {
         spellchecker.setSuggestionLimit(suggestionLimit);
     }
 
-    public void keepUnrecognized(boolean keepUnrecognized){
+    public void keepUnrecognized(boolean keepUnrecognized) {
         spellchecker.keepUnrecognized(keepUnrecognized);
     }
 
-    public void changeLanguage(Language language){
+    public void changeLanguage(Language language) {
         profanityFilter.changeLanguage(language);
         spellchecker.changeLanguage(language);
     }
 
-    public void setProfanityReplacement(String replacement){
+    public void setProfanityReplacement(String replacement) {
         profanityFilter.setProfanityReplacement(replacement);
     }
 
-    public void doRemoveProfaneWord(boolean removeProfaneWord){
+    public void doRemoveProfaneWord(boolean removeProfaneWord) {
         profanityFilter.removeProfaneWord(removeProfaneWord);
     }
 
-    public void setMaxMatchPercentage(float maxMatchPercentage){
+    public void setMaxMatchPercentage(float maxMatchPercentage) {
         spellchecker.setMaxMatchPercentage(maxMatchPercentage);
-    }
-
-    public static void main(String[] args) {
-        Filter filter = new TextFilter(Language.ENGLISH);
-
-        System.out.println(filter.preproccess("helllo", true));
     }
 }
