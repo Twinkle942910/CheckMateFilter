@@ -5,8 +5,6 @@ import com.filter.textcorrector.text_preproccessing.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.regex.Pattern;
-
 public class TextPreproccessor {
     private static Logger LOGGER = LoggerFactory.getLogger(TextPreproccessor.class);
     private static SymbolMapper symbolMapper;

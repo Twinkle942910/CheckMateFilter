@@ -64,6 +64,7 @@ public class Spellchecker {
     }
 
     //TODO: when similar words are misspelled differently there will be two occurrences in map
+    //TODO: return original text if not recognized, not preproccessed.
     public String checkText(String text) {
 
         long startProccessingTime = System.nanoTime();
@@ -141,6 +142,31 @@ public class Spellchecker {
         LOGGER.debug("Checking took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
 
         return preproccessedText;
+    }
+
+    //TODO: change language dynamically.
+    public void setLanguage(Language language){
+
+    }
+
+    public void keepUnrecognized(boolean keepUnrecognized) {
+        this.keepUnrecognized = keepUnrecognized;
+    }
+
+    public void setSuggestionLimit(int suggestionLimit) {
+        this.suggestionLimit = suggestionLimit;
+    }
+
+    public void doCheckCompounds(boolean checkCompounds) {
+        this.checkCompounds = checkCompounds;
+    }
+
+    public void doRemoveRepeatedLetters(boolean removeRepeatedLetters) {
+        this.removeRepeatedLetters = removeRepeatedLetters;
+    }
+
+    public void doPreproccessing(boolean doPreproccessing) {
+        this.doPreproccessing = doPreproccessing;
     }
 
     private <F, T> List<T> convertList(List<F> from, Function<F, T> by) {
@@ -351,6 +377,7 @@ public class Spellchecker {
         //System.out.println(spellchecker.checkCompound("hellolwordl"));
         //System.out.println(spellchecker.isValid("cunt"));
 
-        System.out.println(spellchecker.checkText("You#are d0uch3 and that is $o sad."));
+       // System.out.println(spellchecker.checkText("You#are d0uch3 and that is $o sad."));
+        System.out.println(spellchecker.checkText("hello_city@gmail.com"));
     }
 }
