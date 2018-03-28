@@ -11,4 +11,5 @@ public interface Filter {
     String censor(String text);
     Censored searchForProfanity(String text);
     String preproccess(String text, boolean removeRepeatedLetters);
+    boolean isValid(String word);
 }

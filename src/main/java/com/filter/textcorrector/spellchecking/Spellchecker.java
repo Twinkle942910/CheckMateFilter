@@ -144,9 +144,8 @@ public class Spellchecker {
         return preproccessedText;
     }
 
-    //TODO: change language dynamically.
-    public void setLanguage(Language language){
-
+    public void changeLanguage(Language language){
+        dictionary = DictionaryFactory.create(language);
     }
 
     public void keepUnrecognized(boolean keepUnrecognized) {

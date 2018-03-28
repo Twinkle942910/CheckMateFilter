@@ -55,6 +55,11 @@ public class TextFilter implements Filter {
         return textPreproccessor.preproccess(text, removeRepeatedLetters);
     }
 
+    @Override
+    public boolean isValid(String word) {
+        return spellchecker.isValid(word);
+    }
+
     public void doPreproccessing(boolean doPreproccessing){
         spellchecker.doPreproccessing(doPreproccessing);
     }
@@ -73,6 +78,11 @@ public class TextFilter implements Filter {
 
     public void keepUnrecognized(boolean keepUnrecognized){
         spellchecker.keepUnrecognized(keepUnrecognized);
+    }
+
+    public void changeLanguage(Language language){
+        profanityFilter.chaneLanguage(language);
+        spellchecker.changeLanguage(language);
     }
 
     public static void main(String[] args) {

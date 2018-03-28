@@ -1,38 +1,27 @@
 package com.filter.textcorrector.profanity_filtering;
 
+import com.filter.textcorrector.profanity_filtering.dictionary.Dictionary;
+import com.filter.textcorrector.profanity_filtering.dictionary.DictionaryFactory;
 import com.filter.textcorrector.profanity_filtering.model.Censored;
+import com.filter.textcorrector.spellchecking.Language;
 import com.filter.textcorrector.text_preproccessing.util.TextUtils;
-import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Checks given text for bad words.
  */
-//TODO: separate dictionary and functionality (for replacing dict.).
 public class ProfanityFilter {
     private static Logger LOGGER = LoggerFactory.getLogger(ProfanityFilter.class);
-
-    private List<AhoCorasickDoubleArrayTrie<String>.Hit<String>> badWordList;
-    private AhoCorasickDoubleArrayTrie<String> dictionary = new AhoCorasickDoubleArrayTrie<>();
-    private Map<String, String> badWordsCompounds = new HashMap<>();
-    private final String dictionaryPath;
+    private Dictionary dictionary;
     private String wordReplacement;
 
-    private ProfanityFilter(final String dictionaryPath, final String wordReplacement) {
-        this.dictionaryPath = dictionaryPath;
-        this.wordReplacement = wordReplacement;
-        loadDictionary();
+    private ProfanityFilter(Builder builder) {
+        this.wordReplacement = builder.wordReplacement;
+        dictionary = DictionaryFactory.create(builder.language, builder.dictionaryPath);
     }
 
     /**
@@ -42,12 +31,10 @@ public class ProfanityFilter {
      * @return censored String.
      */
     public String censor(String input) {
-        badWordList = null;
-
         LOGGER.debug("Given text: " + input);
         long startProccessingTime = System.nanoTime();
 
-        Set<String> badWords = badWordsFound(input);
+        Set<String> badWords = dictionary.search(input);
 
         if (badWords.size() > 0) {
             input = clearMultipleProfanity(input.toLowerCase(), badWords);
@@ -62,12 +49,10 @@ public class ProfanityFilter {
     }
 
     public Censored searchForProfanity(String input) {
-        badWordList = null;
-
         LOGGER.debug("Given text: " + input);
         long startProccessingTime = System.nanoTime();
 
-        Set<String> badWords = badWordsFound(input);
+        Set<String> badWords = dictionary.search(input);
 
         if (badWords.size() > 0) {
             input = clearMultipleProfanity(input.toLowerCase(), badWords);
@@ -81,10 +66,26 @@ public class ProfanityFilter {
         return new Censored(input, badWords);
     }
 
+    public void chaneLanguage(Language language){
+        dictionary = DictionaryFactory.create(language, "");
+    }
+
+    private String clearMultipleProfanity(String input, Set<String> badWords) {
+        Iterator<String> badWordIterator = badWords.iterator();
+
+        while (badWordIterator.hasNext()) {
+            String badWord = badWordIterator.next().replaceAll(" ", "");
+            input = TextUtils.replaceCompound(input, badWord.toLowerCase(), wordReplacement);
+        }
+
+        return input;
+    }
+
     public static class Builder {
-        private String dictionaryPath = "dictionaries/bad-word_list.txt";
         private String wordReplacement = "[censored]";
+        private String dictionaryPath = "";
         private boolean wordRemoval = false;
+        private Language language = Language.ENGLISH;
 
         /**
          * Replaces profanity with given replacement.
@@ -123,91 +124,46 @@ public class ProfanityFilter {
             return this;
         }
 
+        public Builder withLanguage(final Language language){
+            this.language = language;
+            return this;
+        }
+
         public ProfanityFilter build() {
-            return new ProfanityFilter(dictionaryPath, wordReplacement);
+            return new ProfanityFilter(this);
         }
-
-    }
-
-    private void loadDictionary() {
-        long startProccessingTime = System.nanoTime();
-        Map<String, String> words = new HashMap<>();
-
-        try (Stream<String> lines = new BufferedReader(
-                new InputStreamReader(ClassLoader.getSystemResourceAsStream(dictionaryPath))).lines()) {
-
-            lines.forEach(badPhrase -> {
-                badWordsCompounds.put(badPhrase.replaceAll(" ", ""), badPhrase);
-                String word = badPhrase.replaceAll(" ", "").toLowerCase();
-                words.put(word, word);
-            });
-        } catch (Exception e) {
-            LOGGER.debug("Something went wrong with loading a file.");
-        }
-
-        long endProccessingTime = System.nanoTime();
-
-        dictionary.build(words);
-        LOGGER.debug("Loading dictionary took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
-    }
-
-    /**
-     * Returns a list with all bad words that occurred in the given text.
-     *
-     * @param input text that is checked for profanity.
-     * @return list of bad words.
-     */
-    private Set<String> badWordsFound(String input) {
-        if (input == null) {
-            return new LinkedHashSet<>();
-        }
-
-        Set<String> badWords = new LinkedHashSet<>();
-        String parseInput = input.toLowerCase().replaceAll("[^a-zA-Z0-9]", "");
-
-        if (badWordList == null) {
-            badWordList = getBadWordList(parseInput);
-        }
-
-        String checkText = input.toLowerCase();
-
-        for (AhoCorasickDoubleArrayTrie<String>.Hit<String> hit : badWordList) {
-            String profanePhrase = hit.value;
-            LOGGER.debug(profanePhrase + " - " + "[" + hit.begin + ":" + hit.end + "]" + " - qualified as a bad word");
-
-            if (TextUtils.containsCompound(checkText, profanePhrase)) {
-                badWords.add(badWordsCompounds.get(profanePhrase));
-                checkText = TextUtils.replaceCompound(checkText, profanePhrase, wordReplacement);
-            }
-        }
-
-        return badWords;
-    }
-
-    private List<AhoCorasickDoubleArrayTrie<String>.Hit<String>> getBadWordList(String input) {
-        List<AhoCorasickDoubleArrayTrie<String>.Hit<String>> badWords = dictionary.parseText(input);
-        badWords.sort((word1, word2) -> Integer.compare(word2.value.length(), word1.value.length()));
-        return badWords;
-    }
-
-    private String clearMultipleProfanity(String input, Set<String> badWords) {
-        Iterator<String> badWordIterator = badWords.iterator();
-
-        while (badWordIterator.hasNext()) {
-            String badWord = badWordIterator.next().replaceAll(" ", "");
-            input = TextUtils.replaceCompound(input, badWord, wordReplacement);
-        }
-
-        return input;
     }
 
     public static void main(String[] args) {
         ProfanityFilter profanityFilter = new ProfanityFilter.Builder()
-                .withWordReplacement("[censored]")
+                .withWordReplacement("[profanity]")
+                .withLanguage(Language.ENGLISH)
                 .build();
 
+        long startProccessingTime = System.nanoTime();
+        System.out.println(profanityFilter.dictionary.size());
+        long endProccessingTime = System.nanoTime();
+        LOGGER.debug("Checking size took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
+
+        long startProccessingTime1 = System.nanoTime();
+        System.out.println("cunt - " + profanityFilter.dictionary.isProfane("Cunt"));
+        long endProccessingTime1 = System.nanoTime();
+        LOGGER.debug("Checking for word took time: " + (endProccessingTime1 - startProccessingTime1) / (double) 1000000 + " ms");
+
+        long startProccessingTime2 = System.nanoTime();
+        System.out.println("assassination - " + profanityFilter.dictionary.isProfane("assassination"));
+        long endProccessingTime2 = System.nanoTime();
+        LOGGER.debug("Checking for word took time: " + (endProccessingTime2 - startProccessingTime2) / (double) 1000000 + " ms");
+
+        long startProccessingTime3 = System.nanoTime();
+        System.out.println("ass-fucker - " + profanityFilter.dictionary.isProfane("suck-off"));
+        long endProccessingTime3 = System.nanoTime();
+        LOGGER.debug("Checking for word took time: " + (endProccessingTime3 - startProccessingTime3) / (double) 1000000 + " ms");
+
         System.out.println(profanityFilter.censor("Hello fucking world holy cow"));
+        System.out.println(profanityFilter.censor("Hello, STFU"));
         System.out.println(profanityFilter.searchForProfanity("stupid motherfucker"));
+        System.out.println(profanityFilter.searchForProfanity("clit"));
         System.out.println(profanityFilter.censor("Little piece of shit and silly cunt"));
     }
 }

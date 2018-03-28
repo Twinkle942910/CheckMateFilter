@@ -1,4 +1,4 @@
-package com.filter.textcorrector.spellchecking.dictionary;
+package com.filter.textcorrector.profanity_filtering.dictionary;
 
 import com.filter.textcorrector.spellchecking.Language;
 
@@ -21,7 +21,11 @@ public class DictionaryFactory {
         map.put(Language.RUSSIAN, RussianDictionary::new);*/
     }
 
-    public static Dictionary create(final Language language) {
+    public static Dictionary create(final Language language, String dictionaryPath) {
+        if(dictionaryPath != null && !dictionaryPath.isEmpty()){
+            return new PlainDictionary(dictionaryPath);
+        }
+
         Supplier<? extends Dictionary> supplier = map.get(language);
 
         if (supplier != null) {
