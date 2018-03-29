@@ -5,6 +5,7 @@ import com.filter.textcorrector.text_preproccessing.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//TODO: Don't map cyrillic symbols when its Russian or Ukrainian language.
 public class TextPreproccessor {
     private static Logger LOGGER = LoggerFactory.getLogger(TextPreproccessor.class);
     private static SymbolMapper symbolMapper;

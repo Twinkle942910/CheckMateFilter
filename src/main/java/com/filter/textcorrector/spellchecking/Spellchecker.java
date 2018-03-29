@@ -66,6 +66,7 @@ public class Spellchecker {
 
     //TODO: when similar words are misspelled differently there will be two occurrences in map
     //TODO: return original text if not recognized, not preproccessed.
+    //TODO: takes to long for a single word. Why?
     public String checkText(String text) {
 
         long startProccessingTime = System.nanoTime();
@@ -382,6 +383,6 @@ public class Spellchecker {
         //System.out.println(spellchecker.isValid("cunt"));
 
        // System.out.println(spellchecker.checkText("You#are d0uch3 and that is $o sad."));
-        System.out.println(spellchecker.checkText("hrlo"));
+        System.out.println(spellchecker.checkWord("cutn"));
     }
 }
