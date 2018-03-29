@@ -6,5 +6,6 @@ public enum Language {
     GERMAN,
     FRENCH,
     RUSSIAN,
-    UKRAINIAN
+    UKRAINIAN,
+    POLISH
 }
