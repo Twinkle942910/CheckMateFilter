@@ -7,7 +7,7 @@ import static org.junit.Assert.assertNotEquals;
 
 public class TextProccessorTest {
 
-    private TextPreproccessor textPreproccessor;
+   /* private TextPreproccessor textPreproccessor;
 
     @Before
     public void setUp(){
@@ -68,5 +68,5 @@ public class TextProccessorTest {
         assertEquals("im for the 23", textPreproccessor.preproccess("i'm for the 2;Ӡ"));
         assertNotEquals("fuck03", textPreproccessor.preproccess("fuck03"));
         assertEquals("fuckoE", textPreproccessor.preproccess("fuck03"));
-    }
+    }*/
 }

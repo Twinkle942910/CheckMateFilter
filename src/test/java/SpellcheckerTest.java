@@ -8,7 +8,7 @@ import static org.junit.Assert.assertNotEquals;
 
 public class SpellcheckerTest {
 
-    private Spellchecker spellchecker;
+  /*  private Spellchecker spellchecker;
 
     @Before
     public void setUp(){
@@ -36,5 +36,5 @@ public class SpellcheckerTest {
 
         assertNotEquals(spellchecker.checkText("croner kase"), "Corner case");
         assertEquals(spellchecker.checkText("croner kase"), "Corner Kate");
-    }
+    }*/
 }
