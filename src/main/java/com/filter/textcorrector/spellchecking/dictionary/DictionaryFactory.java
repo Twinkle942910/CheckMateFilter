@@ -14,7 +14,15 @@ public class DictionaryFactory {
     }
 
     static {
-        map.put(Language.ENGLISH, EnglishDictionary::new);
+        Dictionary  englishDictionary = new EnglishDictionary();
+        Dictionary  russianDictionary = new RussianDictionary();
+
+        map.put(Language.ENGLISH, () -> englishDictionary);
+        map.put(Language.RUSSIAN, () -> russianDictionary);
+
+      /*  map.put(Language.ENGLISH, EnglishDictionary::new);
+        map.put(Language.ENGLISH, RussianDictionary::new);*/
+
         //TODO: load all dictionaries.
  /*       map.put(Language.SPANISH, SpanishDictionary::new);
         map.put(Language.UKRAINIAN, UkrainianDictionary::new);
