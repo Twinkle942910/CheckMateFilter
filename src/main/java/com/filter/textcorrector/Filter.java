@@ -4,7 +4,7 @@ import com.filter.textcorrector.profanity_filtering.model.Censored;
 
 import java.util.List;
 
-public interface Filter {
+public interface Filter extends FilterConfigurer {
     List<String> checkWord(String word);
     List<String> checkCompound(String compound);
     String checkText(String text);

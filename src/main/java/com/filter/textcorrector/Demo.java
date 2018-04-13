@@ -4,7 +4,7 @@ import com.filter.textcorrector.spellchecking.Language;
 
 public class Demo {
     public static void main(String[] args) {
-        TextFilter textFilter = new TextFilter(Language.ENGLISH);
+        Filter textFilter = new TextFilter(Language.ENGLISH);
 
         String word = textFilter.checkWord("cutn").get(0);
         System.out.println(textFilter.censor(word));

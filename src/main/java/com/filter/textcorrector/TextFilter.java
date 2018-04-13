@@ -70,39 +70,48 @@ public class TextFilter implements Filter {
         return profanityFilter.isProfane(word);
     }
 
+    @Override
     public void doPreproccessing(boolean doPreproccessing) {
         spellchecker.doPreproccessing(doPreproccessing);
     }
 
+    @Override
     public void doRemoveRepeatedLetters(boolean doRemoveRepeatedLetters) {
         spellchecker.doRemoveRepeatedLetters(doRemoveRepeatedLetters);
     }
 
+    @Override
     public void doCheckCompounds(boolean doCheckCompounds) {
         spellchecker.doCheckCompounds(doCheckCompounds);
     }
 
+    @Override
     public void setSuggestionLimit(int suggestionLimit) {
         spellchecker.setSuggestionLimit(suggestionLimit);
     }
 
+    @Override
     public void keepUnrecognized(boolean keepUnrecognized) {
         spellchecker.keepUnrecognized(keepUnrecognized);
     }
 
+    @Override
     public void changeLanguage(Language language) {
         profanityFilter.changeLanguage(language);
         spellchecker.changeLanguage(language);
     }
 
+    @Override
     public void setProfanityReplacement(String replacement) {
         profanityFilter.setProfanityReplacement(replacement);
     }
 
+    @Override
     public void doRemoveProfaneWord(boolean removeProfaneWord) {
         profanityFilter.removeProfaneWord(removeProfaneWord);
     }
 
+    @Override
     public void setMaxMatchPercentage(float maxMatchPercentage) {
         spellchecker.setMaxMatchPercentage(maxMatchPercentage);
     }
