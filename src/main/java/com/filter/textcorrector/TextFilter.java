@@ -45,6 +45,7 @@ public class TextFilter implements Filter {
         return spellchecker.checkText(text);
     }
 
+    //TODO: makes all words lower case. Fix.
     @Override
     public String censor(String text) {
         return profanityFilter.censor(text);
