@@ -13,7 +13,11 @@ public class TextFilter implements Filter {
     private ProfanityFilter profanityFilter;
     private TextPreproccessor textPreproccessor;
 
+    private Language language;
+
     public TextFilter(Language language, String dictionaryPath) {
+        this.language = language;
+
         spellchecker = new Spellchecker.Builder(language)
                 .withSuggestionLimit(3)
                 .build();
@@ -72,6 +76,11 @@ public class TextFilter implements Filter {
     }
 
     @Override
+    public Language checkLanguage() {
+        return language;
+    }
+
+    @Override
     public void doPreproccessing(boolean doPreproccessing) {
         spellchecker.doPreproccessing(doPreproccessing);
     }
@@ -98,6 +107,7 @@ public class TextFilter implements Filter {
 
     @Override
     public void changeLanguage(Language language) {
+        this.language = language;
         profanityFilter.changeLanguage(language);
         spellchecker.changeLanguage(language);
     }

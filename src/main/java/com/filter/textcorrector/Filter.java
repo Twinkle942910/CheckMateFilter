@@ -1,6 +1,7 @@
 package com.filter.textcorrector;
 
 import com.filter.textcorrector.profanity_filtering.model.Censored;
+import com.filter.textcorrector.spellchecking.Language;
 
 import java.util.List;
 
@@ -13,4 +14,5 @@ public interface Filter extends FilterConfigurer {
     String preproccess(String text, boolean removeRepeatedLetters);
     boolean isValid(String word);
     boolean isProfane(String word);
+    Language checkLanguage();
 }
