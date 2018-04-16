@@ -65,7 +65,7 @@ public class ProfanityFilter {
         LOGGER.debug("Censored text: " + input);
         LOGGER.debug("Censoring took time: " + (endProccessingTime - startProccessingTime) / (double) 1000000 + " ms");
 
-        return new Censored(input, badWords);
+        return new Censored(input, badWords, !badWords.isEmpty());
     }
 
     public void changeLanguage(Language language){
