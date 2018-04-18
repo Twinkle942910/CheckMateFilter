@@ -1,0 +1,21 @@
+<settings>
+    <servers>
+        <server>
+            <id>checkmate</id>
+            <username>Twinkle942910</username>
+            <password>Maven_swearchecker_200</password>
+        </server>
+    </servers>
+    <profiles>
+        <profile>
+            <id>checkmate</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.passphrase>Twinkle200</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
+</settings>
