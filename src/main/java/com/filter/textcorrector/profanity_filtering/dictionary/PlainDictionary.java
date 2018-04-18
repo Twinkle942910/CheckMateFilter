@@ -49,7 +49,7 @@ public class PlainDictionary implements Dictionary {
         Map<String, String> words = new HashMap<>();
 
         try (Stream<String> lines = new BufferedReader(
-                new InputStreamReader(ClassLoader.getSystemResourceAsStream(DICTIONARY_PATH))).lines()) {
+                new InputStreamReader(getClass().getClassLoader().getResourceAsStream(DICTIONARY_PATH))).lines()) {
 
             lines.forEach(badPhrase -> {
                 String word = badPhrase.replaceAll(" ", "").toLowerCase();
